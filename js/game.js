@@ -94,7 +94,8 @@ function init() {
 function initDrops() {
   for (var i = 0; i < ROW; i++) {
     for (var j = 0; j < COL; j++) {
-      var type = Math.floor(Math.random() * 6);
+      // var type = Math.floor(Math.random() * 6);
+      var type = combo10[i][j];
       var drop = new Drop(dropImages[type], i, j, type, DROP_SIZE);
 
       // ドラッグ可能にするための処理
@@ -124,6 +125,7 @@ function startDrag(event) {
   var instance = event.target;
   instance.addEventListener("pressmove", drag);
   instance.addEventListener("pressup", stopDrag);
+  instance.alpha = 0.5;
 }
 
 function drag(event) {
@@ -160,4 +162,5 @@ function stopDrag(event) {
   // ドラッグを解除すると，ドロップが既定の位置に並ぶように
   instance.x = instance.col * instance.size;
   instance.y = instance.row * instance.size;
+  instance.alpha = 1.0;
 }
