@@ -98,7 +98,7 @@ function initDrops() {
       var drop = new Drop(dropImages[type], i, j, type, DROP_SIZE);
 
       // ドラッグ可能にするための処理
-      if(mouseEventOn) {
+      if (mouseEventOn) {
         drop.addEventListener("mousedown", startDrag);
       }
 
@@ -111,6 +111,8 @@ function initDrops() {
 
 // 描画
 function render() {
+
+
   // CreateJSの更新
   stage.update();
   // requestanimationframeをつかって、ブラウザの更新のタイミングに実行する
@@ -123,24 +125,39 @@ function startDrag(event) {
   instance.addEventListener("pressmove", drag);
   instance.addEventListener("pressup", stopDrag);
 }
+
 function drag(event) {
   var instance = event.target;
   var x = event.stageX;
   var y = event.stageY;
 
-  // TODO: 切り替えをするここから
-  if(instance.movedCheck(x, y)) {
-    var row = instance.movementY(row);
-    var col = instance.movementX(col);
-    console.log(row +"*"+ col);
-    instance.moved(drops[row][col], row, col);
+  // TODO: 挙動が変
+  if (instance.exchengeCheck(x, y)) {
+    var newRow = instance.getExchengeRow(y);
+    var newCol = instance.getExchengeCol(x);
+    console.log("[new]" + newRow + ":" + newCol);
+    console.log("[old]" + instance.row + ":" + instance.col);
+    // 入れ替わったドロップの再描画処理
+    console.log(drops[newRow][newCol]);
+    stage.removeChild(drops[newRow][newCol]);
+
+    drops[instance.row][instance.col] = instance.exchenge(drops[newRow][newCol], instance.row, instance.col);
+    stage.addChild(drops[instance.row][instance.col]);
+
+    instance.row = newRow;
+    instance.col = newCol;
   }
 
-  instance.x = event.stageX - DROP_SIZE / 2;
-  instance.y = event.stageY - DROP_SIZE / 2;
+  // ドラッグしたドロップの移動
+  instance.move(x, y);
+  drops[instance.row][instance.col] = instance;
 }
+
 function stopDrag(event) {
   var instance = event.target;
   instance.removeEventListener("pressmove", drag);
   instance.removeEventListener("pressup", stopDrag);
+  // ドラッグを解除すると，ドロップが既定の位置に並ぶように
+  instance.x = instance.col * instance.size;
+  instance.y = instance.row * instance.size;
 }
