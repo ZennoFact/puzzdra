@@ -31,14 +31,44 @@ Drop.prototype.getExchengeRow = function(y) {
   else if ((this.row + 1) * this.size < y) return this.row + 1;
   else return this.row;
 };
-// TODO: ユーザーが操作しているドロップのあった場所への移動処理
+createjs.MotionGuidePlugin.install();
 Drop.prototype.exchenge = function(drop, row, col) {
-  // 新しい，ドロップの居場所を設定
-  // var drop = new Drop(drop.image, row, col, drop.type, drop.size)
+  // ドロップ入れ替えアニメーションのための座標決定
+  var thisX = this.col * this.size;
+  var thisY = this.row * this.size;
+  var dropX = drop.col * drop.size;
+  var dropY = drop.row * drop.size;
+  var tempX = thisX - dropX;
+  var tempY = thisY - dropY;
+  var centerX, centerY, centerX2, centerY2;
+  var halfSize = this.size / 2;
+  if(thisY === dropY) {
+    centerX = centerX2 = (centerX < centerX2) ? thisX + halfSize : dropX + halfSize;
+    centerY = thisY - this.size;
+    centerY2 = thisY + this.size;
+  } else {
+    centerX = thisX - this.size;
+    centerX2 = thisX + this.size;
+    centerY = centerY2 = (centerY < centerY2) ? thisY + halfSize : dropY + halfSize;
+  }
+
+  // 入れ替えのアニメーション
+  var timeline = new createjs.Timeline();
+  timeline.addTween(createjs.Tween.get(this, { loop: false })
+    .to({guide: {path:[thisX,thisY, centerX,centerY, dropX,dropY], start: 0, end: 1, orient: false},rotation:0}, 100));
+    timeline.addTween(createjs.Tween.get(drop, { loop: false })
+    .to({guide: {path:[thisX,thisY, centerX2,centerY2, dropX,dropY], start: 1, end:0, orient: false},rotation:0}, 100));
+  timeline.addLabel("start", 0);
+  timeline.gotoAndPlay("start");
+
+
+  // 新しい，ドロップの配置を設定
+  var tempDrop = drop;
   drop.row = row;
   drop.col = col;
-  drop.x = col * this.size;
-  drop.y = row * this.size;
+  this.row = tempDrop.row;
+  this.col = tempDrop.col;
+
   return drop;
 };
 Drop.prototype.move = function (x, y) {

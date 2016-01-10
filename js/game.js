@@ -83,6 +83,8 @@ function init() {
   stage.enableDOMEvents(true);
   // 今回の「舞台」を「タッチ（クリック）」「可能」にします
   createjs.Touch.enable(stage);
+  // ステージの外でもマウスムーブを取得するよ
+  stage.mouseMoveOutside = true;
 
   // ドロップの生成をします
   initDrops();
@@ -120,47 +122,78 @@ function render() {
   requestAnimationFrame(render);
 }
 
+var cueDrop;
 // ドラッグアンドドロップ関係の処理
 function startDrag(event) {
   var instance = event.target;
+  instance.alpha = 0.5;
   instance.addEventListener("pressmove", drag);
   instance.addEventListener("pressup", stopDrag);
-  instance.alpha = 0.5;
+  cueDrop = new Drop(instance.image, instance.row, instance.col, instance.type, DROP_SIZE)
+  // サイズの拡大
+  cueDrop.scaleX = cueDrop.scaleY = 1.1;
+  cueDrop.x = event.stageX - cueDrop.size / 2;
+  cueDrop.y = event.stageY - cueDrop.size / 2;
+  cueDrop.alpha = 0.7;
+  stage.addChild(cueDrop);
 }
 
 function drag(event) {
   var instance = event.target;
   var x = event.stageX;
   var y = event.stageY;
+  console.log(x + ":" + y);
 
-  // TODO: 挙動が変
   if (instance.exchengeCheck(x, y)) {
     var newRow = instance.getExchengeRow(y);
     var newCol = instance.getExchengeCol(x);
-    console.log("[new]" + newRow + ":" + newCol);
-    console.log("[old]" + instance.row + ":" + instance.col);
-    // 入れ替わったドロップの再描画処理
-    console.log(drops[newRow][newCol]);
-    stage.removeChild(drops[newRow][newCol]);
-
+    // console.log("[new]" + newRow + ":" + newCol);
+    // console.log("[old]" + instance.row + ":" + instance.col);
+    // ドロップの入れ替え作業
+    stage.addChildAt(drops[instance.row][instance.col], 30);
+    stage.addChildAt(drops[newRow][newCol], 30);
     drops[instance.row][instance.col] = instance.exchenge(drops[newRow][newCol], instance.row, instance.col);
-    stage.addChild(drops[instance.row][instance.col]);
 
     instance.row = newRow;
     instance.col = newCol;
   }
 
-  // ドラッグしたドロップの移動
-  instance.move(x, y);
+  cueDrop.move(x, y);
   drops[instance.row][instance.col] = instance;
+
+  // ステージ外のマウスポインタの座標の取得は，rawXとrawYで取得します
+  if(event.rawX < 0 || canvas.width < event.rawX || event.rawY < 0 || canvas.height < event.rawY) endDrag(instance);
 }
 
 function stopDrag(event) {
   var instance = event.target;
-  instance.removeEventListener("pressmove", drag);
-  instance.removeEventListener("pressup", stopDrag);
+  endDrag(instance);
+}
+
+// TODO: 操作時間の設定
+// TODO: 高速に動かしすぎると，画面買いに出たときにアニメーションがついていかない。
+function endDrag(drop) {
+  drop.removeEventListener("pressmove", drag);
+  drop.removeEventListener("pressup", stopDrag);
   // ドラッグを解除すると，ドロップが既定の位置に並ぶように
-  instance.x = instance.col * instance.size;
-  instance.y = instance.row * instance.size;
-  instance.alpha = 1.0;
+  drop.x = drop.col * drop.size;
+  drop.y = drop.row * drop.size;
+  drop.alpha = 1.0;
+  stage.removeChild(cueDrop);
+
+
+  // TODO: 以下の処理をコンボが途切れるまで継続。この間，ドラッグ操作無効化
+
+  // コンボ情報を返す処理
+  var comboDrops = comboCheck(drops);
+  // コンボ情報をもとにドロップを消去
+  drops = comboAction(drops, comboDrops);
+  // コンボにより，空白が発生したらドロップを降らせる
+  drops = fallDrops(drops);
+}
+function comboAction(drops, comboDrops) {
+  // TODO: コンボの実際の処理
+}
+function fallDrops(drops) {
+  // TODO: コンボ後のドロップ落下処理
 }
