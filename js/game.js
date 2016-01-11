@@ -114,8 +114,6 @@ function initDrops() {
 
 // 描画
 function render() {
-
-
   // CreateJSの更新
   stage.update();
   // requestanimationframeをつかって、ブラウザの更新のタイミングに実行する
@@ -142,7 +140,6 @@ function drag(event) {
   var instance = event.target;
   var x = event.stageX;
   var y = event.stageY;
-  console.log(x + ":" + y);
 
   if (instance.exchengeCheck(x, y)) {
     var newRow = instance.getExchengeRow(y);
@@ -150,6 +147,7 @@ function drag(event) {
     // console.log("[new]" + newRow + ":" + newCol);
     // console.log("[old]" + instance.row + ":" + instance.col);
     // ドロップの入れ替え作業
+    // TODO: Uncaught TypeError: Cannot read property '2' of undefined 2回目のドロップ移動にて発生
     stage.addChildAt(drops[instance.row][instance.col], 30);
     stage.addChildAt(drops[newRow][newCol], 30);
     drops[instance.row][instance.col] = instance.exchenge(drops[newRow][newCol], instance.row, instance.col);
@@ -176,8 +174,12 @@ function endDrag(drop) {
   drop.removeEventListener("pressmove", drag);
   drop.removeEventListener("pressup", stopDrag);
   // ドラッグを解除すると，ドロップが既定の位置に並ぶように
-  drop.x = drop.col * drop.size;
-  drop.y = drop.row * drop.size;
+  var col = drop.col;
+  var row = drop.row;
+  if (5 < col) col = 5;
+  if (4 < row) row = 4;
+  drop.x = col * drop.size;
+  drop.y = row * drop.size;
   drop.alpha = 1.0;
   stage.removeChild(cueDrop);
 
@@ -185,11 +187,22 @@ function endDrag(drop) {
   // TODO: 以下の処理をコンボが途切れるまで継続。この間，ドラッグ操作無効化
 
   // コンボ情報を返す処理
-  var comboDrops = comboCheck(drops);
-  // コンボ情報をもとにドロップを消去
-  drops = comboAction(drops, comboDrops);
-  // コンボにより，空白が発生したらドロップを降らせる
-  drops = fallDrops(drops);
+  var comboDrops = [ // ドロップの配置を記憶しておく二次元配列5*6
+    [9,9,9,9,9,9],
+    [9,9,9,9,9,9],
+    [9,9,9,9,9,9],
+    [9,9,9,9,9,9],
+    [9,9,9,9,9,9],
+  ];
+  // while (comboData = comboCheck(comboDrops, drops)) {
+  comboData = comboCheck(comboDrops, drops);
+    console.log(comboData);
+    // コンボ情報をもとにドロップを消去
+    // drops = comboAction(drops, comboData);
+    // コンボにより，空白が発生したらドロップを降らせる
+    // drops = fallDrops(drops);
+  // }
+  console.log("end of 1 step");
 }
 function comboAction(drops, comboDrops) {
   // TODO: コンボの実際の処理
