@@ -18,6 +18,9 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
   dropIsDelete = false,
   dropIsFallen = false,
   isLoop = false,
+  timerStart = false,
+  timeLimmit = -1,
+  operateTime,
   isOperable; // ドロップを操作可能かどうか
 
 // プログラム内で読み込む画像データなどをここで手元に置いておくことにします。「あらかじめ」やることをまとめるよ命令です
@@ -117,6 +120,9 @@ function initDrops() {
 
 // 描画
 function render() {
+  if (timerStart) {
+    timeLimmit--;
+  }
   // CreateJSの更新
   stage.update();
   // requestanimationframeをつかって、ブラウザの更新のタイミングに実行する
@@ -143,7 +149,6 @@ function drag(event) {
   var instance = event.target;
   var x = event.stageX;
   var y = event.stageY;
-
   if (instance.exchengeCheck(x, y)) {
     var newRow = instance.getExchengeRow(y);
     var newCol = instance.getExchengeCol(x);
@@ -152,6 +157,10 @@ function drag(event) {
     // ドロップの入れ替え作業
     mmSound.stop();
     mmSound.play();
+    if(!timerStart) {
+      timeLimmit = operateTime;
+      timerStart = true;
+    }
     stage.addChildAt(drops[instance.row][instance.col], 30);
     stage.addChildAt(drops[newRow][newCol], 30);
     drops[instance.row][instance.col] = instance.exchenge(drops[newRow][newCol], instance.row, instance.col);
@@ -162,9 +171,15 @@ function drag(event) {
 
   cueDrop.move(x, y);
   drops[instance.row][instance.col] = instance;
-
+  if (timerStart && timeLimmit < 0) {
+    endDrag(instance);
+    sounds[4].play();
+  }
   // ステージ外のマウスポインタの座標の取得は，rawXとrawYで取得します
-  if (event.rawX < 0 || canvas.width < event.rawX || event.rawY < 0 || canvas.height < event.rawY) endDrag(instance);
+  if (event.rawX < 0 || canvas.width < event.rawX || event.rawY < 0 || canvas.height < event.rawY) {
+    endDrag(instance);
+    sounds[4].play();
+  }
 }
 
 function stopDrag(event) {
@@ -179,6 +194,8 @@ var comboDrops,
   fallenDropCount = 0;
 
 function endDrag(drop) {
+  timerStart = false;
+
   drop.removeEventListener("pressmove", drag);
   drop.removeEventListener("pressup", stopDrag);
   // ドラッグを解除すると，ドロップが既定の位置に並ぶように
@@ -235,11 +252,10 @@ function comboAction() {
   for (var i = comboData.length - 1; 0 <= i; i--) {
     for (var j = 0; j < comboData[0].length; j++) {
       if (comboData[i][j] !== 9) {
-        ddSound.stop();
-        ddSound.play();
         timeline.addTween(createjs.Tween.get(drops[i][j], {
             loop: false
           })
+          .wait(250)
           .to({
             alpha: 0.0
           }, 300)
@@ -256,6 +272,8 @@ function deleteDrop() {
   // タイムライン完了時のみ削除作業を開始
   deleteDropCount--;
   if (deleteDropCount === 0) {
+    ddSound.stop();
+    ddSound.play();
     for (var i = 0; i < comboData.length; i++) {
       for (var j = 0; j < comboData[0].length; j++) {
         if (comboData[i][j] !== 9) {
