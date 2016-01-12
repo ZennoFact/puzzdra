@@ -7,14 +7,12 @@ function comboCheck(comboDrops, drops) {
        comboDrops = comboData.comboDrops;
     }
   }
-  console.log("checkDropTypeHorizontal End");
   // 縦方向へのドロップのつながりを確認。下4行のみを判定
   for (var i = comboDrops.length - 1; 1 < i; i--) {
     for (var j = 0; j < comboDrops[0].length; j++) {
       comboDrops = checkDropTypeVertical(i, j, comboDrops, drops);
     }
   }
-  console.log("checkDropTypeVertical End");
   var isSuccess = false;
   for (var i = 0; i < comboDrops.length; i++) {
     for (var j = 0; j < comboDrops[0].length; j++) {
@@ -32,9 +30,6 @@ function comboCheck(comboDrops, drops) {
 // 横方向のドロップのつながりを判定
 function checkDropTypeHorizontal(i, j, comboDrops, drops) {
   var notCombo = false;
-  console.log("[" + i + "," + j + "]");
-  console.log();
-  console.log(comboDrops);
   if(drops[i][j].type === drops[i][j + 1].type && drops[i][j].type === drops[i][j + 2].type) {
     comboDrops[i][j] = comboDrops[i][j + 1] = comboDrops[i][j + 2] = drops[i][j].type;
     j++;

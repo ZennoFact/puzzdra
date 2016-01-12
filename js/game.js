@@ -147,7 +147,6 @@ function drag(event) {
     // console.log("[new]" + newRow + ":" + newCol);
     // console.log("[old]" + instance.row + ":" + instance.col);
     // ドロップの入れ替え作業
-    // TODO: Uncaught TypeError: Cannot read property '2' of undefined 2回目のドロップ移動にて発生
     stage.addChildAt(drops[instance.row][instance.col], 30);
     stage.addChildAt(drops[newRow][newCol], 30);
     drops[instance.row][instance.col] = instance.exchenge(drops[newRow][newCol], instance.row, instance.col);
@@ -171,7 +170,9 @@ function stopDrag(event) {
 // TODO: 操作時間の設定
 // TODO: 高速に動かしすぎると，画面買いに出たときにアニメーションがついていかない。
 var comboDrops,
-  deleteDropCount = 0;
+  deleteDropCount = 0,
+  fallenDropCount = 0;
+
 function endDrag(drop) {
   drop.removeEventListener("pressmove", drag);
   drop.removeEventListener("pressup", stopDrag);
@@ -185,8 +186,14 @@ function endDrag(drop) {
   drop.alpha = 1.0;
   stage.removeChild(cueDrop);
 
+  deleteAndFallenDrop();
 
+  console.log("end of 1 step");
+}
+// 落ち込んが途切れるまで呼び出され続ける関数
+function deleteAndFallenDrop() {
   // TODO: 以下の処理をコンボが途切れるまで継続。この間，ドラッグ操作無効化
+  console.log("Start Delete & Fallen");
 
   // コンボ情報を返す処理
   comboDrops = [ // ドロップの配置を記憶しておく二次元配列5*6　
@@ -196,14 +203,13 @@ function endDrag(drop) {
     [9, 9, 9, 9, 9, 9],
     [9, 9, 9, 9, 9, 9],
   ];
-  // while (comboData = comboCheck(comboDrops, drops)) {
   comboData = comboCheck(comboDrops, drops);
+  if (!comboData) {
+    return;
+  }
   // コンボ情報をもとにドロップを消去
-  // 一旦，コンボを考えずに頑張る
+  // TODO: 一旦，コンボを考えずに頑張る
   comboAction();
-
-  // }
-  console.log("end of 1 step");
 }
 
 function comboAction() {
@@ -249,20 +255,32 @@ function deleteDrop() {
         }
       }
     }
-    console.log("Drop deleted");
     fallDrops();
   }
 }
 
 function fallDrops() {
-  console.log("start drops fall");
-console.log(drops);
+  var tempData = $.extend(true, [], drops);
+  for (var i = tempData.length - 1; 0 <= i; i--) {
+    for (var j = 0; j < tempData[0].length; j++) {
+      if (tempData[i][j] === null) {
+        fallenDropCount++;
+        var existFallDrop = existUpperDrop(tempData, i - 1, j);
+        if (existFallDrop) {
+          tempData[i][j] = tempData[existFallDrop.i][j];
+          tempData[existFallDrop.i][j] = null;
+          tempData[i][j].row = i;
+        }
+      }
+    }
+  }
+
   // TODO: コンボ後のドロップ落下処理
   var timeline = new createjs.Timeline();
   for (var i = comboData.length - 1; 0 <= i; i--) {
     for (var j = 0; j < comboData[0].length; j++) {
-      var fallDrop;
       if (drops[i][j] === null) {
+        fallenDropCount--;
         var existFallDrop = existUpperDrop(drops, i - 1, j);
         if (existFallDrop) {
           drops[i][j] = drops[existFallDrop.i][j];
@@ -285,7 +303,8 @@ console.log(drops);
           })
           .to({
             y: drops[i][j].row * drops[i][j].size
-          }, 250));
+          }, 250)
+          .call(dropDeleteCompleted));
       }
     }
   }
@@ -302,5 +321,11 @@ function existUpperDrop(drops, i, j) {
     return {
       i: i
     };
+  }
+}
+
+function dropDeleteCompleted() {
+  if (fallenDropCount === 0) {
+    deleteAndFallenDrop();
   }
 }
