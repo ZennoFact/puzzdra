@@ -14,7 +14,10 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
   WIDTH, // パズル画面の幅
   HEIGHT, // パズル画面の高さ
   dropImages = [],
-  mouseEventOn,
+  mouseEventOn = false,
+  dropIsDelete = false,
+  dropIsFallen = false,
+  isLoop = false,
   isOperable; // ドロップを操作可能かどうか
 
 // プログラム内で読み込む画像データなどをここで手元に置いておくことにします。「あらかじめ」やることをまとめるよ命令です
@@ -96,8 +99,8 @@ function init() {
 function initDrops() {
   for (var i = 0; i < ROW; i++) {
     for (var j = 0; j < COL; j++) {
-      // var type = Math.floor(Math.random() * 6);
-      var type = combo10[i][j];
+      var type = Math.floor(Math.random() * 6);
+      // var type = combo10[i][j];
       var drop = new Drop(dropImages[type], i, j, type, DROP_SIZE);
 
       // ドラッグ可能にするための処理
@@ -186,12 +189,12 @@ function endDrag(drop) {
   drop.alpha = 1.0;
   stage.removeChild(cueDrop);
 
-  deleteAndFallenDrop();
+  deleteAndFallenDrops();
 
   console.log("end of 1 step");
 }
 // 落ち込んが途切れるまで呼び出され続ける関数
-function deleteAndFallenDrop() {
+function deleteAndFallenDrops() {
   // TODO: 以下の処理をコンボが途切れるまで継続。この間，ドラッグ操作無効化
   console.log("Start Delete & Fallen");
 
@@ -209,7 +212,9 @@ function deleteAndFallenDrop() {
   }
   // コンボ情報をもとにドロップを消去
   // TODO: 一旦，コンボを考えずに頑張る
-  comboAction();
+  if (dropIsDelete) {
+    comboAction();
+  }
 }
 
 function comboAction() {
@@ -255,7 +260,9 @@ function deleteDrop() {
         }
       }
     }
-    fallDrops();
+    if (dropIsFallen) {
+      fallDrops();
+    }
   }
 }
 
@@ -327,6 +334,14 @@ function existUpperDrop(drops, i, j) {
 
 function dropDeleteCompleted() {
   if (fallenDropCount === 0) {
-    deleteAndFallenDrop();
+    if(isLoop) {
+      deleteAndFallenDrops();
+    }
+  }
+}
+
+function stageClear() {
+  if (stage) {
+      stage.removeAllChildren();
   }
 }

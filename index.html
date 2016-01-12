@@ -17,20 +17,30 @@
     <h1>京都コンピュータ学院体験授業</h1>
     <h2>パズルゲーム編</h2>
     <textarea id="editor" name="name" rows="20" cols="50">
-<script>
-// Step.2 使用するドロップのタイプを設定します
-// (現在はsample1とsample2のどちらかです)
+/* Step.Extra 使用するドロップのタイプを設定します
+   (現在はsample1とsample2のどちらかです) */
 var dropType = "sample1";
 
-// Step.1 ドロップを読み込む
-// この行の下に「preload(dropType);」と入力してください。
+/* Step.1 ドロップを読み込みます。
+   この行の下に「preload(dropType);」と入力してください。 */
+preload(dropType);
 
+/* Step.2 ドロップをドラッグできるようにします。
+   この行の下に「mouseEventOn = true;」と入力してください。 */
+mouseEventOn = true;
 
-// Step.3 マウスの操作を有効にする
-// この行の下に「mouseEventOn = true;」と入力してください。
+/* Step.3 ドロップが消えるようにします
+  この行の下に「dropIsDelete = true;」と入力してください。 */
+dropIsDelete = true;
 
+/* Step.4 ドロップが落ちるようにします。
+  この行の下に「dropIsFallen = true;」と入力してください。 */
+dropIsFallen = true;
 
-</script>
+/* Step.5 ドロップが落ちた後，つながっていたら消えるようにします・
+  この行の下に「isLoop = true;」と入力してください。 */
+isLoop = true;
+
     </textarea>
   </section>
   <script src="./js/lib/jquery-2.1.3.min.js"></script>
@@ -43,17 +53,8 @@ var dropType = "sample1";
   <script src="./js/game.js"></script>
   <script>
     $('button').click(function(){
-      $('#code').html($('#editor').val());
-    })
-
-    // // Step.1 使用するドロップのタイプを設定してください
-    // var dropType = "sample2";
-    //
-    // // Step.2 マウスの操作を有効にする
-    // mouseEventOn = true;
-    // preload(dropType);
-
-
+      $('#code').html("<script>stageClear();" + $('#editor').val() + "<\/script>");
+    });
   </script>
   <divv id="code"></div>
 </body>
