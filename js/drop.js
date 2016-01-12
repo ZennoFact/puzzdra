@@ -55,9 +55,9 @@ Drop.prototype.exchenge = function(drop, row, col) {
   // 入れ替えのアニメーション
   var timeline = new createjs.Timeline();
   timeline.addTween(createjs.Tween.get(this, { loop: false })
-    .to({guide: {path:[thisX,thisY, centerX,centerY, dropX,dropY], start: 0, end: 1, orient: false},rotation:0}, 100));
+    .to({guide: {path:[thisX,thisY, centerX,centerY, dropX,dropY], start: 0, end: 1, orient: false},rotation:0}, 150));
     timeline.addTween(createjs.Tween.get(drop, { loop: false })
-    .to({guide: {path:[thisX,thisY, centerX2,centerY2, dropX,dropY], start: 1, end:0, orient: false},rotation:0}, 100));
+    .to({guide: {path:[thisX,thisY, centerX2,centerY2, dropX,dropY], start: 1, end:0, orient: false},rotation:0}, 150));
   timeline.addLabel("start", 0);
   timeline.gotoAndPlay("start");
 

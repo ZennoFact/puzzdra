@@ -276,6 +276,7 @@ function fallDrops() {
   }
 
   // TODO: コンボ後のドロップ落下処理
+  // 配列のディープコピーを作成
   var timeline = new createjs.Timeline();
   for (var i = comboData.length - 1; 0 <= i; i--) {
     for (var j = 0; j < comboData[0].length; j++) {
