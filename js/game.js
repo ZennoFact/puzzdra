@@ -150,6 +150,8 @@ function drag(event) {
     // console.log("[new]" + newRow + ":" + newCol);
     // console.log("[old]" + instance.row + ":" + instance.col);
     // ドロップの入れ替え作業
+    mmSound.stop();
+    mmSound.play();
     stage.addChildAt(drops[instance.row][instance.col], 30);
     stage.addChildAt(drops[newRow][newCol], 30);
     drops[instance.row][instance.col] = instance.exchenge(drops[newRow][newCol], instance.row, instance.col);
@@ -233,6 +235,8 @@ function comboAction() {
   for (var i = comboData.length - 1; 0 <= i; i--) {
     for (var j = 0; j < comboData[0].length; j++) {
       if (comboData[i][j] !== 9) {
+        ddSound.stop();
+        ddSound.play();
         timeline.addTween(createjs.Tween.get(drops[i][j], {
             loop: false
           })
