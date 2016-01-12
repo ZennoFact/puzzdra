@@ -10,7 +10,7 @@ function comboCheck(comboDrops, drops) {
   console.log("checkDropTypeHorizontal End");
   // 縦方向へのドロップのつながりを確認。下4行のみを判定
   for (var i = comboDrops.length - 1; 1 < i; i--) {
-    for (var j = 0; j < comboDrops[0].length - 1; j++) {
+    for (var j = 0; j < comboDrops[0].length; j++) {
       comboDrops = checkDropTypeVertical(i, j, comboDrops, drops);
     }
   }
@@ -32,14 +32,17 @@ function comboCheck(comboDrops, drops) {
 // 横方向のドロップのつながりを判定
 function checkDropTypeHorizontal(i, j, comboDrops, drops) {
   var notCombo = false;
+  console.log("[" + i + "," + j + "]");
+  console.log();
+  console.log(comboDrops);
   if(drops[i][j].type === drops[i][j + 1].type && drops[i][j].type === drops[i][j + 2].type) {
     comboDrops[i][j] = comboDrops[i][j + 1] = comboDrops[i][j + 2] = drops[i][j].type;
-    j += 2;
+    j++;
   } else {
     notCombo = true;
   }
 
-  if(notCombo || drops[0].length - 2 < j) {
+  if(notCombo || drops[0].length - 3 < j) {
     var result = {
       "j": j,
       "comboDrops": comboDrops
@@ -63,7 +66,7 @@ function checkDropTypeVertical(i, j, comboDrops, drops) {
   if(notCombo || i < 2) {
     return comboDrops;
   } else {
-    return checkDropTypeHorizontal(i, j, comboDrops, drops);
+    return checkDropTypeVertical(i, j, comboDrops, drops);
   }
 }
 
