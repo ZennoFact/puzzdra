@@ -67,6 +67,8 @@ function checkDropTypeVertical(i, j, comboDrops, drops) {
   }
 }
 
+// どこのドロップがどのコンボなのかを対応させる。
+// 実際のところはcomboDropsにオブジェクト突っ込めばこのメソッド使わなくても何とかなるような気はする。
 function checkComboCount() {
 
 }
