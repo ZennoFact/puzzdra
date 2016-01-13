@@ -16,13 +16,16 @@
   <section id="editor-area">
     <h1>京都コンピュータ学院体験授業</h1>
     <h2>パズルゲーム編</h2>
+    <p>下部のエディタ内のプログラムを変更します。</p>
+    <p>変更完了後は，RUNボタンを押してプログラムを起動してください。</p>
     <textarea id="editor" name="name" rows="20" cols="50">
-/* Step.Extra 使用するドロップのタイプを設定します
-   (現在はsample1とsample2のどちらかです) */
-var dropType = "sample1";
-var mmSound = sounds[0];
-var ddSound = sounds[2];
-operateTime = 240;
+/* Step.Extra システム設定：終了後，自由に変更を加えてください */
+var dropType = "sample1"; // 「sample2」と変更可能
+var mmSound = sounds[0]; // 「sounds[1]」と変更可能
+var ddSound = sounds[2]; // 「sounds[3]」と変更可能
+operateTime = 2000; // 操作時間（フレーム）
+deleteTime =  300; // ドロップ消滅時間（ミリ秒）
+fallTime = 250; // ドロップ落下時間（ミリ秒）
 
 /* Step.1 ドロップを読み込みます。
    この行の下に「preload(dropType);」と入力してください。 */

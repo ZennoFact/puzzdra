@@ -21,6 +21,8 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
   timerStart = false,
   timeLimmit = -1,
   operateTime,
+  deleteTime,
+  fallTime,
   isOperable; // ドロップを操作可能かどうか
 
 // プログラム内で読み込む画像データなどをここで手元に置いておくことにします。「あらかじめ」やることをまとめるよ命令です
@@ -258,7 +260,7 @@ function comboAction() {
           .wait(250)
           .to({
             alpha: 0.0
-          }, 300)
+          }, deleteTime)
           // TODO: ここ，タイムライン全体の完了を取得したい
           .call(deleteDrop));
       }
@@ -333,7 +335,7 @@ function fallDrops() {
           })
           .to({
             y: drops[i][j].row * drops[i][j].size
-          }, 250)
+          }, fallTime)
           .call(dropDeleteCompleted));
       }
     }
