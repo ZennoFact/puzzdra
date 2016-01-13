@@ -361,7 +361,7 @@ function fallDrops() {
           })
           .to({
             y: drops[i][j].row * drops[i][j].size
-          }, fallTime)
+          }, fallTime, createjs.Ease.quartOut)
           .call(dropDeleteCompleted));
       }
     }

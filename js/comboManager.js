@@ -76,6 +76,7 @@ function checkComboCount(comboDrops) {
         // TODO: 判定
         if (j !== 0 && comboDrops[i][j].type === comboDrops[i][j - 1].type ) {
           comboDrops[i][j].combo = comboDrops[i][j - 1].combo;
+          comboDrops = comboTrace(i, j, comboDrops, comboDrops[i][j].type);
         } else {
           comboDrops = comboTrace(i, j, comboDrops, comboDrops[i][j].type);
           comboCounter++;
@@ -89,7 +90,6 @@ function checkComboCount(comboDrops) {
   };
 }
 function comboTrace(i, j, drops, type) {
-
   drops[i][j].combo = comboCounter;
   if(0 <= j - 1 && drops[i][j - 1].type === type) {
     drops = comboTrace(i, j - 1, drops, type);
@@ -97,9 +97,12 @@ function comboTrace(i, j, drops, type) {
   if(0 <= i - 1 && drops[i - 1][j].type === type) {
     drops = comboTrace(i - 1, j, drops, type);
   }
-  // if(j + 1 < drops[0].length && drops[i][j + 1].type === type) {
-  //   drops = comboTrace(i, j + 1, drops, type);
-  // }
-
+  return drops;
+}
+function comboTraceOnlyVertical(i, j, drops, type) {
+  if(0 <= i - 1 && drops[i - 1][j].type === type) {
+    drops[i - 1][j].combo = drops[i][j].combo;
+    drops = comboTrace(i - 1, j, drops, type);
+  }
   return drops;
 }
