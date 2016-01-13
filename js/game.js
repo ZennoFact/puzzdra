@@ -193,11 +193,13 @@ function stopDrag(event) {
 // TODO: 操作時間の設定
 // TODO: 高速に動かしすぎると，画面買いに出たときにアニメーションがついていかない。
 var comboDrops,
+  comboCount,
   deleteDropCount = 0,
   fallenDropCount = 0;
 
 function endDrag(drop) {
   timerStart = false;
+  comboCount = 0;
 
   drop.removeEventListener("pressmove", drag);
   drop.removeEventListener("pressup", stopDrag);
@@ -231,11 +233,11 @@ function deleteAndFallenDrops() {
 
   // コンボ情報を返す処理
   comboDrops = [ // ドロップの配置を記憶しておく二次元配列5*6　
-    [9, 9, 9, 9, 9, 9], // ここには，{comboCount, dropType}の配列を仕込めればコンボの処理は簡単になるのでは？
-    [9, 9, 9, 9, 9, 9],
-    [9, 9, 9, 9, 9, 9],
-    [9, 9, 9, 9, 9, 9],
-    [9, 9, 9, 9, 9, 9],
+    [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}],
+    [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}],
+    [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}],
+    [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}],
+    [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}]
   ];
   comboData = comboCheck(comboDrops, drops);
   if (!comboData) {
@@ -250,6 +252,10 @@ function deleteAndFallenDrops() {
   // コンボ情報をもとにドロップを消去
   // TODO: 一旦，コンボを考えずに頑張る
   if (dropIsDelete) {
+    var data = checkComboCount(comboData);
+    comboData = data.drops;
+    comboCount = data.count;
+    console.log(comboData);
     comboAction();
   }
 }
@@ -258,7 +264,7 @@ function comboAction() {
   // TODO: コンボの実際の処理　今はコンボを考えずに，一気に消す
   for (var i = comboData.length - 1; 0 <= i; i--) {
     for (var j = 0; j < comboData[0].length; j++) {
-      if (comboData[i][j] !== 9) {
+      if (comboData[i][j].type !== 9) {
         deleteDropCount++;
       }
     }
@@ -267,34 +273,41 @@ function comboAction() {
   var timeline = new createjs.Timeline();
   // TODO: assEventlistenerで追加できるイベントは？
   // timeline.addEventListener('complete', deleteDrop)
-  for (var i = comboData.length - 1; 0 <= i; i--) {
-    for (var j = 0; j < comboData[0].length; j++) {
-      if (comboData[i][j] !== 9) {
-        timeline.addTween(createjs.Tween.get(drops[i][j], {
+  var index = 1;
+  while (index <= comboCount) {
+    for (var i = comboData.length - 1; 0 <= i; i--) {
+      for (var j = 0; j < comboData[0].length; j++) {
+        if (comboData[i][j].combo === index ) {
+          if (j === 5) {
+          }
+          timeline.addTween(createjs.Tween.get(drops[i][j], {
             loop: false
           })
-          .wait(250)
+          .wait(250 * index)
           .to({
             alpha: 0.0
           }, deleteTime)
           // TODO: ここ，タイムライン全体の完了を取得したい
           .call(deleteDrop));
+        }
       }
     }
+    index++;
   }
   timeline.addLabel("start", 0);
   timeline.gotoAndPlay("start");
 }
 
 function deleteDrop() {
+  ddSound.stop();
+  ddSound.play();
+
   // タイムライン完了時のみ削除作業を開始
   deleteDropCount--;
   if (deleteDropCount === 0) {
-    ddSound.stop();
-    ddSound.play();
     for (var i = 0; i < comboData.length; i++) {
       for (var j = 0; j < comboData[0].length; j++) {
-        if (comboData[i][j] !== 9) {
+        if (comboData[i][j].type !== 9) {
           stage.removeChild(drops[i][j]);
           drops[i][j] = null;
         }
@@ -325,8 +338,8 @@ function fallDrops() {
   // TODO: コンボ後のドロップ落下処理
   // 配列のディープコピーを作成
   var timeline = new createjs.Timeline();
-  for (var i = comboData.length - 1; 0 <= i; i--) {
-    for (var j = 0; j < comboData[0].length; j++) {
+  for (var i = drops.length - 1; 0 <= i; i--) {
+    for (var j = 0; j < drops[0].length; j++) {
       if (drops[i][j] === null) {
         fallenDropCount--;
         var existFallDrop = existUpperDrop(drops, i - 1, j);
