@@ -110,7 +110,8 @@ function initDrops() {
 
       // ドラッグ可能にするための処理
       if (mouseEventOn) {
-        drop.addEventListener("mousedown", startDrag);
+        setDragEventForDrop(drop);
+        // drop.addEventListener("mousedown", startDrag);
       }
 
       // 舞台に画面を「備品として追加」するよ
@@ -219,6 +220,15 @@ function deleteAndFallenDrops() {
   // TODO: 以下の処理をコンボが途切れるまで継続。この間，ドラッグ操作無効化
   console.log("Start Delete & Fallen");
 
+  // ドラッグを不可に設定
+  if(drops[0][0].hasEventListener("mousedown")) {
+    for (var i = drops.length - 1; 0 <= i; i--) {
+      for (var j = 0; j < drops[0].length; j++) {
+        drops[i][j].removeEventListener("mousedown", startDrag);
+      }
+    }
+  }
+
   // コンボ情報を返す処理
   comboDrops = [ // ドロップの配置を記憶しておく二次元配列5*6　
     [9, 9, 9, 9, 9, 9], // ここには，{comboCount, dropType}の配列を仕込めればコンボの処理は簡単になるのでは？
@@ -229,6 +239,12 @@ function deleteAndFallenDrops() {
   ];
   comboData = comboCheck(comboDrops, drops);
   if (!comboData) {
+    // ドラッグイベントの復活
+    for (var i = drops.length - 1; 0 <= i; i--) {
+      for (var j = 0; j < drops[0].length; j++) {
+        setDragEventForDrop(drops[i][j]);
+      }
+    }
     return;
   }
   // コンボ情報をもとにドロップを消去
@@ -322,10 +338,7 @@ function fallDrops() {
           var type = Math.floor(Math.random() * 6);
           var drop = new Drop(dropImages[type], i, j, type, DROP_SIZE);
           drop.y -= HEIGHT;
-          // ドラッグ可能にするための処理
-          if (mouseEventOn) {
-            drop.addEventListener("mousedown", startDrag);
-          }
+
           drops[i][j] = drop;
           stage.addChild(drops[i][j]);
         }
@@ -368,4 +381,8 @@ function stageClear() {
   if (stage) {
       stage.removeAllChildren();
   }
+}
+function setDragEventForDrop(drop) {
+  // ドラッグ可能にするための処理
+  drop.addEventListener("mousedown", startDrag);
 }

@@ -23,7 +23,7 @@
 var dropType = "sample1"; // 「sample2」と変更可能
 var mmSound = sounds[0]; // 「sounds[1]」と変更可能
 var ddSound = sounds[2]; // 「sounds[3]」と変更可能
-operateTime = 2000; // 操作時間（フレーム）
+operateTime = 1000; // 操作時間（フレーム）
 deleteTime =  300; // ドロップ消滅時間（ミリ秒）
 fallTime = 250; // ドロップ落下時間（ミリ秒）
 
@@ -63,7 +63,6 @@ isLoop = true;
     $('button').click(function(){
       $('#code').html("<script>stageClear();" + $('#editor').val() + "<\/script>");
     });
-    console.log(sounds);
   </script>
   <divv id="code"></div>
 </body>
