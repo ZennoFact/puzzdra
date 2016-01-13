@@ -132,11 +132,9 @@ function initDrops() {
 function render() {
   if (timerStart) {
     timeLimmit--;
-    console.log(96 * timeLimmit / operateTime);
     // TODO: このやり方は違うらしい
-    limmitBar.set({
-      width: 96 * timeLimmit / operateTime
-    });
+    // limmitBar.setTransform(limmitBar.x, limmitBar.y, 96 * timeLimmit / operateTime, 96);
+    // limmitBar.setTransform(0, 0, temp, 96);
   }
   // CreateJSの更新
   stage.update();
@@ -162,10 +160,19 @@ function startDrag(event) {
   stage.addChild(cueDrop);
 
   // 時間関係の処理
-  var graphics = new createjs.Graphics().beginFill("#ffffff").drawRect(event.stageX - 50, event.stageY - 50, 100, 30);
-  timeBar = new createjs.Shape(graphics);
-  var graphics2 = new createjs.Graphics().beginFill("#0099dd").drawRect(event.stageX - 48, event.stageY - 48, 96, 26);
-  limmitBar = new createjs.Shape(graphics2);
+  timeBar = new createjs.Shape();
+  timeBar.graphics.beginFill("#ffffff").drawRect(0, 0, 100, 30);
+  timeBar.set({
+    x: event.stageX,
+    y: event.stageY - 30
+  });
+  limmitBar = new createjs.Shape();
+  limmitBar.graphics.beginFill("#0099dd").drawRect(0, 0, 96, 26);
+  limmitBar.cache(0, 0, 96, 26);
+  limmitBar.set({
+    x: event.stageX + 2,
+    y: event.stageY - 28
+  });
   stage.addChild(timeBar);
   stage.addChild(limmitBar);
 }
@@ -177,8 +184,6 @@ function drag(event) {
   if (instance.exchengeCheck(x, y)) {
     var newRow = instance.getExchengeRow(y);
     var newCol = instance.getExchengeCol(x);
-    // console.log("[new]" + newRow + ":" + newCol);
-    // console.log("[old]" + instance.row + ":" + instance.col);
     // ドロップの入れ替え作業
     mmSound.stop();
     if(!timerStart) {
@@ -195,16 +200,25 @@ function drag(event) {
   }
 
   cueDrop.move(x, y);
-  // TODO: この辺から操作時間のシークバーを作成
+  // timeBarの位置をマウスに追従させる
   timeBar.set({
-    x: x - 50,
-    y: y - 50
+    x: x,
+    y: y - 30
   });
+  // 操作時間の経過に合わせて幅だけ倍率を変更していく
+  limmitBar.setTransform(0, 0, timeLimmit / operateTime, 1);
+  // 設定しておいたフィルターをもとに，バーの色を変更する
+  if (timerStart && timeLimmit / operateTime < 0.3) {
+    limmitBar.filters = [
+      // TODO: タイマーの色を設定できるようにしてあげよう
+      new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0, 0)
+    ];
+    limmitBar.updateCache();
+  }
   limmitBar.set({
-    x: x - 48,
-    y: y - 48
+    x: x + 2,
+    y: y - 28
   });
-
   drops[instance.row][instance.col] = instance;
   if (timerStart && timeLimmit < 0) {
     endDrag(instance);
