@@ -14,6 +14,7 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
   WIDTH, // パズル画面の幅
   HEIGHT, // パズル画面の高さ
   dropImages = [],
+  bgImage,
   mouseEventOn = false,
   dropIsDelete = false,
   dropIsFallen = false,
@@ -51,6 +52,9 @@ function preload(folderName) {
   }, {
     "id": "cure",
     "src": basePath + folderName + "/cure.png"
+  }, {
+    "id": "bg-image",
+    "src": basePath + "bg.png"
   }];
   // 指定したリスト（マニフェスト）に従って画像を読み込むよー
   queue.loadManifest(manifest, false);
@@ -72,6 +76,7 @@ function handleComplete(event) {
   dropImages[3] = result["light"];
   dropImages[4] = result["dark"];
   dropImages[5] = result["cure"];
+  bgImage = result["bg-image"];
 
   // よし，事前情報は集まった。いざ，このプログラムの初期化を初期化するよ
   init();
@@ -87,6 +92,8 @@ function init() {
 
   // さあ，いよいよ僕らの舞台を作成するよ。「canvas」を使って舞台を作って保存！
   stage = new createjs.Stage(canvas);
+  var bg = new createjs.Bitmap(bgImage);
+  stage.addChild(bg);
 
   stage.enableDOMEvents(true);
   // 今回の「舞台」を「タッチ（クリック）」「可能」にします
@@ -125,6 +132,11 @@ function initDrops() {
 function render() {
   if (timerStart) {
     timeLimmit--;
+    console.log(96 * timeLimmit / operateTime);
+    // TODO: このやり方は違うらしい
+    limmitBar.set({
+      width: 96 * timeLimmit / operateTime
+    });
   }
   // CreateJSの更新
   stage.update();
@@ -132,7 +144,9 @@ function render() {
   requestAnimationFrame(render);
 }
 
-var cueDrop;
+var cueDrop,
+  timeBar,
+  limmitBar;
 // ドラッグアンドドロップ関係の処理
 function startDrag(event) {
   var instance = event.target;
@@ -140,12 +154,20 @@ function startDrag(event) {
   instance.addEventListener("pressmove", drag);
   instance.addEventListener("pressup", stopDrag);
   cueDrop = new Drop(instance.image, instance.row, instance.col, instance.type, DROP_SIZE)
-    // サイズの拡大
+  // サイズの拡大
   cueDrop.scaleX = cueDrop.scaleY = 1.1;
   cueDrop.x = event.stageX - cueDrop.size / 2;
   cueDrop.y = event.stageY - cueDrop.size / 2;
   cueDrop.alpha = 0.7;
   stage.addChild(cueDrop);
+
+  // 時間関係の処理
+  var graphics = new createjs.Graphics().beginFill("#ffffff").drawRect(event.stageX - 50, event.stageY - 50, 100, 30);
+  timeBar = new createjs.Shape(graphics);
+  var graphics2 = new createjs.Graphics().beginFill("#0099dd").drawRect(event.stageX - 48, event.stageY - 48, 96, 26);
+  limmitBar = new createjs.Shape(graphics2);
+  stage.addChild(timeBar);
+  stage.addChild(limmitBar);
 }
 
 function drag(event) {
@@ -159,11 +181,11 @@ function drag(event) {
     // console.log("[old]" + instance.row + ":" + instance.col);
     // ドロップの入れ替え作業
     mmSound.stop();
-    mmSound.play();
     if(!timerStart) {
       timeLimmit = operateTime;
       timerStart = true;
     }
+    mmSound.play();
     stage.addChildAt(drops[instance.row][instance.col], 30);
     stage.addChildAt(drops[newRow][newCol], 30);
     drops[instance.row][instance.col] = instance.exchenge(drops[newRow][newCol], instance.row, instance.col);
@@ -173,6 +195,16 @@ function drag(event) {
   }
 
   cueDrop.move(x, y);
+  // TODO: この辺から操作時間のシークバーを作成
+  timeBar.set({
+    x: x - 50,
+    y: y - 50
+  });
+  limmitBar.set({
+    x: x - 48,
+    y: y - 48
+  });
+
   drops[instance.row][instance.col] = instance;
   if (timerStart && timeLimmit < 0) {
     endDrag(instance);
@@ -212,6 +244,8 @@ function endDrag(drop) {
   drop.y = row * drop.size;
   drop.alpha = 1.0;
   stage.removeChild(cueDrop);
+  stage.removeChild(timeBar);
+  stage.removeChild(limmitBar);
 
   deleteAndFallenDrops();
 
@@ -255,7 +289,6 @@ function deleteAndFallenDrops() {
     var data = checkComboCount(comboData);
     comboData = data.drops;
     comboCount = data.count;
-    console.log(comboData);
     comboAction();
   }
 }
