@@ -24,6 +24,10 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
   operateTime,
   deleteTime,
   fallTime,
+  recode = {
+    score: 0,
+    combo: 0
+  },
   isOperable; // ドロップを操作可能かどうか
 
 // プログラム内で読み込む画像データなどをここで手元に置いておくことにします。「あらかじめ」やることをまとめるよ命令です
@@ -260,6 +264,10 @@ function endDrag(drop) {
   stage.removeChild(cueDrop);
   stage.removeChild(timeBar);
   stage.removeChild(limmitBar);
+  recode = {
+    score: 0,
+    combo: 0
+  };
 
   deleteAndFallenDrops();
 
@@ -321,16 +329,18 @@ function comboAction() {
   // TODO: assEventlistenerで追加できるイベントは？
   // timeline.addEventListener('complete', deleteDrop)
   var index = 1;
+
   while (index <= comboCount) {
     for (var i = comboData.length - 1; 0 <= i; i--) {
       for (var j = 0; j < comboData[0].length; j++) {
         if (comboData[i][j].combo === index ) {
           if (j === 5) {
           }
+          recode.combo++;
           timeline.addTween(createjs.Tween.get(drops[i][j], {
             loop: false
           })
-          .wait(250 * index)
+          .wait(250 * index) // TODO: ここの処理が不適切。コンボを追うごとに落ちコンボでも待ち時間が延長される
           .to({
             alpha: 0.0
           }, deleteTime)
@@ -339,8 +349,11 @@ function comboAction() {
         }
       }
     }
+    recode.score += recode.combo * (1 + index / 10);
     index++;
   }
+  recode.combo = comboCount;
+  console.log(recode);
   timeline.addLabel("start", 0);
   timeline.gotoAndPlay("start");
 }
