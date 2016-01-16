@@ -77,8 +77,8 @@ function init() {
 function initDrops() {
   for (var i = 0; i < ROW; i++) {
     for (var j = 0; j < COL; j++) {
-      var type = Math.floor(Math.random() * 6);
-      // var type = combo10[i][j];
+      // var type = Math.floor(Math.random() * 6);
+      var type = testDrops[i][j];
       var drop = new Drop(dropImages[type], i, j, type, DROP_SIZE);
       // ドラッグ可能にするための処理
       if (mouseEventOn) {
@@ -265,14 +265,15 @@ function deleteAndFallenDrops() {
   }
   // コンボ情報をもとにドロップを消去
   if (dropIsDelete) {
-    var data = checkComboCount(comboData);
+    var data = checkComboCount(comboData, comboCount);
     comboData = data.drops;
     comboCount = data.count;
-    comboAction();
+    var phaseCombo = data.phaseCombo
+    comboAction(phaseCombo);
   }
 }
 
-function comboAction() {
+function comboAction(phaseCombo) {
   comboData.forEach(function(array) {
     array.forEach(function(data) {
       if (data.type !== 9) {
@@ -285,7 +286,7 @@ function comboAction() {
   // TODO: assEventlistenerで追加できるイベントは？
   // timeline.addEventListener('complete', deleteDrop)
   var index = 1;
-
+console.log(comboData);
   while (index <= comboCount) {
     comboData.forEach(function(array, i){
       array.forEach(function(data, j) {

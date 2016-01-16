@@ -2,9 +2,9 @@ function comboCheck(comboDrops, drops) {
   // 横方向へのドロップのつながりを確認。左側4列のみ判定
   for (var i = comboDrops.length - 1; 0 <= i; i--) {
     for (var j = 0; j < comboDrops[0].length - 2; j++) {
-       var comboData = checkDropTypeHorizontal(i, j, comboDrops, drops);
-       j = comboData.j;
-       comboDrops = comboData.comboDrops;
+      var comboData = checkDropTypeHorizontal(i, j, comboDrops, drops);
+      j = comboData.j;
+      comboDrops = comboData.comboDrops;
     }
   }
   // 縦方向へのドロップのつながりを確認。下4行のみを判定
@@ -24,21 +24,21 @@ function comboCheck(comboDrops, drops) {
     }
   }
   // コンボの結果を返す
-  if ( isSuccess ) return comboDrops;
+  if (isSuccess) return comboDrops;
   else return false;
 }
 
 // 横方向のドロップのつながりを判定
 function checkDropTypeHorizontal(i, j, comboDrops, drops) {
   var notCombo = false;
-  if(drops[i][j].type === drops[i][j + 1].type && drops[i][j].type === drops[i][j + 2].type) {
+  if (drops[i][j].type === drops[i][j + 1].type && drops[i][j].type === drops[i][j + 2].type) {
     comboDrops[i][j].type = comboDrops[i][j + 1].type = comboDrops[i][j + 2].type = drops[i][j].type;
     j++;
   } else {
     notCombo = true;
   }
 
-  if(notCombo || drops[0].length - 3 < j) {
+  if (notCombo || drops[0].length - 3 < j) {
     var result = {
       "j": j,
       "comboDrops": comboDrops
@@ -52,14 +52,14 @@ function checkDropTypeHorizontal(i, j, comboDrops, drops) {
 // 縦方向のドロップのつながりを計算
 function checkDropTypeVertical(i, j, comboDrops, drops) {
   var notCombo = false;
-  if(drops[i][j].type === drops[i - 1][j].type && drops[i][j].type === drops[i - 2][j].type) {
+  if (drops[i][j].type === drops[i - 1][j].type && drops[i][j].type === drops[i - 2][j].type) {
     comboDrops[i][j].type = comboDrops[i - 1][j].type = comboDrops[i - 2][j].type = drops[i][j].type;
     i -= 2;
   } else {
     notCombo = true;
   }
 
-  if(notCombo || i < 2) {
+  if (notCombo || i < 2) {
     return comboDrops;
   } else {
     return checkDropTypeVertical(i, j, comboDrops, drops);
@@ -69,40 +69,82 @@ function checkDropTypeVertical(i, j, comboDrops, drops) {
 var comboCounter;
 // どこのドロップがどのコンボなのかを対応させる。
 function checkComboCount(comboDrops) {
-  comboCounter = 1;
+  comboCounter = 0;
+  var phaseCombo = 0;
   for (var i = comboDrops.length - 1; 0 <= i; i--) {
     for (var j = 0; j < comboDrops[0].length; j++) {
       if (comboDrops[i][j].type !== 9 && comboDrops[i][j].combo === 0) {
         // TODO: 判定
-        if (j !== 0 && comboDrops[i][j].type === comboDrops[i][j - 1].type ) {
-          comboDrops[i][j].combo = comboDrops[i][j - 1].combo;
-          comboDrops = comboTrace(i, j, comboDrops, comboDrops[i][j].type);
+        comboCounter++;
+        phaseCombo++;
+        console.log("[" + i + "," + j + "]判定スタート:combo" + comboCounter);
+        if (j === 0) {
+          comboTraceTopRightDown(i, j, comboDrops, comboDrops[i][j].type, i, j);
         } else {
-          comboDrops = comboTrace(i, j, comboDrops, comboDrops[i][j].type);
-          comboCounter++;
+          comboTraceLeftTopRight(i, j, comboDrops, comboDrops[i][j].type, i, j);
         }
+        console.log("判定終了");
+        console.log(comboDrops);
       }
     }
   }
+  // TODO: ドロップの削除をスムーズにするためにはphasecomboが必要なはず。まだ使ってないけど
   return {
+    drops: comboDrops,
     count: comboCounter,
-    drops: comboDrops
+    phaseCombo: phaseCombo
   };
 }
-function comboTrace(i, j, drops, type) {
-  drops[i][j].combo = comboCounter;
-  if(0 <= j - 1 && drops[i][j - 1].type === type) {
-    drops = comboTrace(i, j - 1, drops, type);
+
+function comboTraceDownLeftTop(i, j, drops, type, prevI, prevJ) {
+  if (drops[i][j].type === (drops[prevI][prevJ]).type) {
+    drops[i][j].combo = comboCounter;
+    traceDown(i, j, drops, type, prevI, prevJ);
+    traceLeft(i, j, drops, type, prevI, prevJ);
+    traceTop(i, j, drops, type, prevI, prevJ);
   }
-  if(0 <= i - 1 && drops[i - 1][j].type === type) {
-    drops = comboTrace(i - 1, j, drops, type);
-  }
-  return drops;
 }
-function comboTraceOnlyVertical(i, j, drops, type) {
-  if(0 <= i - 1 && drops[i - 1][j].type === type) {
-    drops[i - 1][j].combo = drops[i][j].combo;
-    drops = comboTrace(i - 1, j, drops, type);
+function comboTraceLeftTopRight(i, j, drops, type, prevI, prevJ) {
+  if (drops[i][j].type === (drops[prevI][prevJ]).type) {
+    drops[i][j].combo = comboCounter;
+    traceLeft(i, j, drops, type, prevI, prevJ);
+    traceTop(i, j, drops, type, prevI, prevJ);
+    traceRight(i, j, drops, type, prevI, prevJ);
   }
-  return drops;
+}
+function comboTraceTopRightDown(i, j, drops, type, prevI, prevJ) {
+  if (drops[i][j].type === (drops[prevI][prevJ]).type) {
+    drops[i][j].combo = comboCounter;
+    traceTop(i, j, drops, type, prevI, prevJ);
+    traceRight(i, j, drops, type, prevI, prevJ);
+    traceDown(i, j, drops, type, prevI, prevJ);
+  }
+}
+function comboTraceRightDownLeft(i, j, drops, type, prevI, prevJ) {
+  if (drops[i][j].type === (drops[prevI][prevJ]).type) {
+    drops[i][j].combo = comboCounter;
+    traceRight(i, j, drops, type, prevI, prevJ);
+    traceDown(i, j, drops, type, prevI, prevJ);
+    traceLeft(i, j, drops, type, prevI, prevJ);
+  }
+}
+function traceLeft(i, j, drops, type, prevI, prevJ) {
+  if (0 <= j - 1 && drops[i][j - 1].combo === 0) {
+    comboTraceDownLeftTop(i, j - 1, drops, type, i, j);
+  }
+}
+function traceTop(i, j, drops, type, prevI, prevJ) {
+  if (0 <= i - 1 && drops[i - 1][i].combo === 0) {
+    comboTraceLeftTopRight(i - 1, j, drops, type, i, j);
+  }
+}
+function traceRight(i, j, drops, type, prevI, prevJ) {
+  if (j + 1 < drops[0].length && drops[i][j + 1].combo === 0) {
+    comboTraceTopRightDown(i, j + 1, drops, type, i, j);
+  }
+}
+function traceDown(i, j, drops, type, prevI, prevJ) {
+  if (i + 1 < drops.length && drops[i + 1][i].combo === 0) {
+    comboTraceRightDownLeft(i + 1, j, drops, type, i, j);
+  }
 }
