@@ -21,8 +21,8 @@
     <textarea id="editor" name="name" rows="20" cols="50">
 /* Step.Extra システム設定：終了後，自由に変更を加えてください */
 var dropType = "sample1"; // 「sample2」と変更可能
-var mmSound = sounds[0]; // 「sounds[1]」と変更可能
-var ddSound = sounds[2]; // 「sounds[3]」と変更可能
+mmSound = sounds[0]; // 「sounds[1]」と変更可能
+ddSound = sounds[2]; // 「sounds[3]」と変更可能
 operateTime = 400; // 操作時間（フレーム）
 deleteTime =  300; // ドロップ消滅時間（ミリ秒）
 fallTime = 250; // ドロップ落下時間（ミリ秒）
@@ -56,6 +56,7 @@ isLoop = true;
   <script src="./js/lib/soundjs-0.6.2.min.js"></script>
   <script src="./js/cheat.js"></script>
   <script src="./js/system.js"></script>
+  <script src="./js/functions.js"></script>
   <script src="./js/drop.js"></script>
   <script src="./js/comboManager.js"></script>
   <script src="./js/game.js"></script>

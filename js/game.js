@@ -28,104 +28,62 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
     score: 0,
     combo: 0
   },
+  operatingEndMusicIndex = 4,
+  mmSound,
+  ddSound,
   isOperable; // ドロップを操作可能かどうか
+  // ドロップ移動時に関係する変数群
+  var cueDrop,
+  timeBar,
+  limmitBar;
 
-// プログラム内で読み込む画像データなどをここで手元に置いておくことにします。「あらかじめ」やることをまとめるよ命令です
+// 画像データの取得処理（開始前にデータロードを実行する）
 function preload(folderName) {
   var queue = new createjs.LoadQueue(false);
   queue.setMaxConnections(2);
-
   var basePath = "./assets/drop_image/";
-  // どの画像をどんな名前で管理するかを決定するよ。「id」は「識別子」，誰ともかぶることのない，独自の番号（名前）。「src」は「source（源）」の略
-  var manifest = [{
-    "id": "fire",
-    "src": basePath + folderName + "/fire.png"
-  }, {
-    "id": "water",
-    "src": basePath + folderName + "/water.png"
-  }, {
-    // どっち使ったらいいのかを決めなきゃね
-    "id": "tree",
-    "src": basePath + folderName + "/tree.png"
-  }, {
-    "id": "light",
-    "src": basePath + folderName + "/light.png"
-  }, {
-    "id": "dark",
-    "src": basePath + folderName + "/dark.png"
-  }, {
-    "id": "cure",
-    "src": basePath + folderName + "/cure.png"
-  }, {
-    "id": "bg-image",
-    "src": basePath + "bg.png"
-  }];
-  // 指定したリスト（マニフェスト）に従って画像を読み込むよー
+  var manifest = getImageManifest(basePath, folderName);
+  // 取得したマニフェストをもとにファイルの読み込み
   queue.loadManifest(manifest, false);
   queue.load();
-  // 読み込みが完了したら「handleComplete」って命令を起動するよ
-  queue.addEventListener("complete", handleComplete);
-
+  // 全ファイルの読み込みが完了した際の処理を登録
+  queue.addEventListener("complete", function (event) {
+    var result = event.target._loadedResults;
+    dropImages = getDropImageArray(result);
+    bgImage = result["bg-image"];
+    // ゲームの初期化へ
+    init();
+  });
 }
 
-// 読み込みが完了したよ，万歳。取得した情報は「event」という名前で取得することにします
-function handleComplete(event) {
-  // 読み込み完了に伴い，その結果を保存します
-  var result = event.target._loadedResults;
-  // 決めてあった箱に画像データを入れていくよ。
-  // プログラムで「=」は，左辺のものに右辺のものを入れます意味です。イコールじゃないから要注意
-  dropImages[0] = result["fire"];
-  dropImages[1] = result["water"];
-  dropImages[2] = result["tree"];
-  dropImages[3] = result["light"];
-  dropImages[4] = result["dark"];
-  dropImages[5] = result["cure"];
-  bgImage = result["bg-image"];
-
-  // よし，事前情報は集まった。いざ，このプログラムの初期化を初期化するよ
-  init();
-}
-
-// 初期化（initialize）するための命令です。必要な情報を箱に詰め込んでいきます
+// 初期化（initialize）処理
 function init() {
   canvas = $("#canvas")[0];
-  WIDTH = COL * DROP_SIZE;
-  HEIGHT = ROW * DROP_SIZE;
-  canvas.width = WIDTH;
-  canvas.height = HEIGHT;
+  WIDTH = canvas.width = COL * DROP_SIZE;
+  HEIGHT = canvas.height = ROW * DROP_SIZE;
 
-  // さあ，いよいよ僕らの舞台を作成するよ。「canvas」を使って舞台を作って保存！
   stage = new createjs.Stage(canvas);
-  var bg = new createjs.Bitmap(bgImage);
-  stage.addChild(bg);
+  stage.addChild(new createjs.Bitmap(bgImage));
 
-  stage.enableDOMEvents(true);
-  // 今回の「舞台」を「タッチ（クリック）」「可能」にします
+  // stage.enableDOMEvents(true);
   createjs.Touch.enable(stage);
-  // ステージの外でもマウスムーブを取得するよ
   stage.mouseMoveOutside = true;
 
-  // ドロップの生成をします
   initDrops();
-
-  // ドロップの準備ができたので，描画を開始
+  // 初期化完了，描画(ゲーム)の開始
   render();
 }
-
+// ドロップ情報の初期化とstageへの追加
 function initDrops() {
   for (var i = 0; i < ROW; i++) {
     for (var j = 0; j < COL; j++) {
       var type = Math.floor(Math.random() * 6);
       // var type = combo10[i][j];
       var drop = new Drop(dropImages[type], i, j, type, DROP_SIZE);
-
       // ドラッグ可能にするための処理
       if (mouseEventOn) {
         setDragEventForDrop(drop);
-        // drop.addEventListener("mousedown", startDrag);
       }
-
-      // 舞台に画面を「備品として追加」するよ
       drops[i][j] = drop;
       stage.addChild(drops[i][j]);
     }
@@ -136,27 +94,22 @@ function initDrops() {
 function render() {
   if (timerStart) {
     timeLimmit--;
-    // TODO: このやり方は違うらしい
-    // limmitBar.setTransform(limmitBar.x, limmitBar.y, 96 * timeLimmit / operateTime, 96);
-    // limmitBar.setTransform(0, 0, temp, 96);
   }
   // CreateJSの更新
   stage.update();
+  // TODO: tickを使うべきかの判断
   // requestanimationframeをつかって、ブラウザの更新のタイミングに実行する
   requestAnimationFrame(render);
 }
 
-var cueDrop,
-  timeBar,
-  limmitBar;
-// ドラッグアンドドロップ関係の処理
+// ドロップ操作関係の処理
 function startDrag(event) {
   var instance = event.target;
   instance.alpha = 0.5;
   instance.addEventListener("pressmove", drag);
   instance.addEventListener("pressup", stopDrag);
+
   cueDrop = new Drop(instance.image, instance.row, instance.col, instance.type, DROP_SIZE)
-  // サイズの拡大
   cueDrop.scaleX = cueDrop.scaleY = 1.1;
   cueDrop.x = event.stageX - cueDrop.size / 2;
   cueDrop.y = event.stageY - cueDrop.size / 2;
@@ -195,6 +148,7 @@ function drag(event) {
       timerStart = true;
     }
     mmSound.play();
+    // TODO: 描画を先頭にもってくる方法はこれしかないのか？
     stage.addChildAt(drops[instance.row][instance.col], 30);
     stage.addChildAt(drops[newRow][newCol], 30);
     drops[instance.row][instance.col] = instance.exchenge(drops[newRow][newCol], instance.row, instance.col);
@@ -231,7 +185,7 @@ function drag(event) {
   // ステージ外のマウスポインタの座標の取得は，rawXとrawYで取得します
   if (event.rawX < 0 || canvas.width < event.rawX || event.rawY < 0 || canvas.height < event.rawY) {
     endDrag(instance);
-    sounds[4].play();
+    sounds[operatingEndMusicIndex].play();
   }
 }
 
@@ -280,11 +234,11 @@ function deleteAndFallenDrops() {
 
   // ドラッグを不可に設定
   if(drops[0][0].hasEventListener("mousedown")) {
-    for (var i = drops.length - 1; 0 <= i; i--) {
-      for (var j = 0; j < drops[0].length; j++) {
-        drops[i][j].removeEventListener("mousedown", startDrag);
-      }
-    }
+    drops.forEach(function(array) {
+      array.forEach(function(drop) {
+        drop.removeEventListener("mousedown", startDrag);
+      });
+    });
   }
 
   // コンボ情報を返す処理
@@ -296,17 +250,20 @@ function deleteAndFallenDrops() {
     [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}]
   ];
   comboData = comboCheck(comboDrops, drops);
+  console.log(comboData);
   if (!comboData) {
+    console.log("?");
     // ドラッグイベントの復活
-    for (var i = drops.length - 1; 0 <= i; i--) {
-      for (var j = 0; j < drops[0].length; j++) {
-        setDragEventForDrop(drops[i][j]);
-      }
-    }
+    drops.forEach(function(array, i) {
+      array.forEach(function(drop, j) {
+        setDragEventForDrop(drop);
+        // console.log("OK");
+        // drops[i][j].addEventListener("mousedown", startDrag);
+      });
+    });
     return;
   }
   // コンボ情報をもとにドロップを消去
-  // TODO: 一旦，コンボを考えずに頑張る
   if (dropIsDelete) {
     var data = checkComboCount(comboData);
     comboData = data.drops;
@@ -316,14 +273,13 @@ function deleteAndFallenDrops() {
 }
 
 function comboAction() {
-  // TODO: コンボの実際の処理　今はコンボを考えずに，一気に消す
-  for (var i = comboData.length - 1; 0 <= i; i--) {
-    for (var j = 0; j < comboData[0].length; j++) {
-      if (comboData[i][j].type !== 9) {
+  comboData.forEach(function(array) {
+    array.forEach(function(data) {
+      if (data.type !== 9) {
         deleteDropCount++;
       }
-    }
-  }
+    });
+  });
   // ドロップ削除のアニメーション
   var timeline = new createjs.Timeline();
   // TODO: assEventlistenerで追加できるイベントは？
@@ -331,11 +287,9 @@ function comboAction() {
   var index = 1;
 
   while (index <= comboCount) {
-    for (var i = comboData.length - 1; 0 <= i; i--) {
-      for (var j = 0; j < comboData[0].length; j++) {
-        if (comboData[i][j].combo === index ) {
-          if (j === 5) {
-          }
+    comboData.forEach(function(array, i){
+      array.forEach(function(data, j) {
+        if (data.combo === index ) {
           recode.combo++;
           timeline.addTween(createjs.Tween.get(drops[i][j], {
             loop: false
@@ -347,8 +301,8 @@ function comboAction() {
           // TODO: ここ，タイムライン全体の完了を取得したい
           .call(deleteDrop));
         }
-      }
-    }
+      });
+    });
     recode.score += recode.combo * (1 + index / 10);
     index++;
   }
@@ -359,20 +313,21 @@ function comboAction() {
 }
 
 function deleteDrop() {
+  // TODO: IEだと，音声の読み込みが間に合わず，エラーになる可能性あり
   ddSound.stop();
   ddSound.play();
 
   // タイムライン完了時のみ削除作業を開始
   deleteDropCount--;
   if (deleteDropCount === 0) {
-    for (var i = 0; i < comboData.length; i++) {
-      for (var j = 0; j < comboData[0].length; j++) {
-        if (comboData[i][j].type !== 9) {
+    comboData.forEach(function(array, i){
+      array.forEach(function(data, j) {
+        if (data.type !== 9) {
           stage.removeChild(drops[i][j]);
           drops[i][j] = null;
         }
-      }
-    }
+      });
+    });
     if (dropIsFallen) {
       fallDrops();
     }
@@ -380,10 +335,11 @@ function deleteDrop() {
 }
 
 function fallDrops() {
+  // 配列のディープコピーを作成
   var tempData = $.extend(true, [], drops);
-  for (var i = tempData.length - 1; 0 <= i; i--) {
-    for (var j = 0; j < tempData[0].length; j++) {
-      if (tempData[i][j] === null) {
+  tempData.forEach(function(array, i){
+    array.forEach(function(data, j) {
+      if (data === null) {
         fallenDropCount++;
         var existFallDrop = existUpperDrop(tempData, i - 1, j);
         if (existFallDrop) {
@@ -392,11 +348,10 @@ function fallDrops() {
           tempData[i][j].row = i;
         }
       }
-    }
-  }
+    });
+  });
 
   // TODO: コンボ後のドロップ落下処理
-  // 配列のディープコピーを作成
   var timeline = new createjs.Timeline();
   for (var i = drops.length - 1; 0 <= i; i--) {
     for (var j = 0; j < drops[0].length; j++) {
@@ -443,7 +398,9 @@ function existUpperDrop(drops, i, j) {
 }
 
 function dropDeleteCompleted() {
-  if (fallenDropCount === 0) {
+  console.log(fallenDropCount);
+  // TODO: ここ，なぜか０と一致しない
+  if (fallenDropCount <= 0) {
     if(isLoop) {
       deleteAndFallenDrops();
     }
