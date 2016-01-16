@@ -74,14 +74,14 @@ function checkComboCount(comboDrops) {
   for (var i = comboDrops.length - 1; 0 <= i; i--) {
     for (var j = 0; j < comboDrops[0].length; j++) {
       if (comboDrops[i][j].type !== 9 && comboDrops[i][j].combo === 0) {
-        console.log("[" + i + "," + j + "]判定スタート");
         // TODO: 判定
         comboCounter++;
         phaseCombo++;
+        console.log("[" + i + "," + j + "]判定スタート:combo" + comboCounter);
         if (j === 0) {
-          comboDrops[i][j].combo = comboTraceTopRightDown(i, j, comboDrops, comboDrops[i][j].type, i, j);
+          comboTraceTopRightDown(i, j, comboDrops, comboDrops[i][j].type, i, j);
         } else {
-          comboDrops[i][j].combo = comboTraceLeftTopRight(i, j, comboDrops, comboDrops[i][j].type, i, j);
+          comboTraceLeftTopRight(i, j, comboDrops, comboDrops[i][j].type, i, j);
         }
         console.log("判定終了");
         console.log(comboDrops);
@@ -97,66 +97,54 @@ function checkComboCount(comboDrops) {
 }
 
 function comboTraceDownLeftTop(i, j, drops, type, prevI, prevJ) {
-  console.log("DownLeftTop"+"["+i+","+j+"]");
   if (drops[i][j].type === (drops[prevI][prevJ]).type) {
+    drops[i][j].combo = comboCounter;
     traceDown(i, j, drops, type, prevI, prevJ);
     traceLeft(i, j, drops, type, prevI, prevJ);
     traceTop(i, j, drops, type, prevI, prevJ);
   }
-  return comboCounter;
 }
 function comboTraceLeftTopRight(i, j, drops, type, prevI, prevJ) {
-  console.log("LeftTopRight"+"["+i+","+j+"]");
   if (drops[i][j].type === (drops[prevI][prevJ]).type) {
+    drops[i][j].combo = comboCounter;
     traceLeft(i, j, drops, type, prevI, prevJ);
     traceTop(i, j, drops, type, prevI, prevJ);
     traceRight(i, j, drops, type, prevI, prevJ);
   }
-  return comboCounter;
 }
 function comboTraceTopRightDown(i, j, drops, type, prevI, prevJ) {
-  console.log("TopRightDown"+"["+i+","+j+"]");
   if (drops[i][j].type === (drops[prevI][prevJ]).type) {
+    drops[i][j].combo = comboCounter;
     traceTop(i, j, drops, type, prevI, prevJ);
     traceRight(i, j, drops, type, prevI, prevJ);
     traceDown(i, j, drops, type, prevI, prevJ);
   }
-  return comboCounter;
 }
 function comboTraceRightDownLeft(i, j, drops, type, prevI, prevJ) {
-  console.log("RightDownLeft"+"["+i+","+j+"]");
   if (drops[i][j].type === (drops[prevI][prevJ]).type) {
+    drops[i][j].combo = comboCounter;
     traceRight(i, j, drops, type, prevI, prevJ);
     traceDown(i, j, drops, type, prevI, prevJ);
     traceLeft(i, j, drops, type, prevI, prevJ);
   }
-  return comboCounter;
 }
 function traceLeft(i, j, drops, type, prevI, prevJ) {
-  console.log("Left"+"["+i+","+j+"]");
   if (0 <= j - 1 && drops[i][j - 1].combo === 0) {
-    console.log("OK");
-    drops[i][j].combo = comboTraceDownLeftTop(i, j - 1, drops, type, i, j);
+    comboTraceDownLeftTop(i, j - 1, drops, type, i, j);
   }
 }
 function traceTop(i, j, drops, type, prevI, prevJ) {
-  console.log("Top"+"["+i+","+j+"]");
   if (0 <= i - 1 && drops[i - 1][i].combo === 0) {
-    console.log("OK");
-    drops[i][j].combo = comboTraceLeftTopRight(i - 1, j, drops, type, i, j);
+    comboTraceLeftTopRight(i - 1, j, drops, type, i, j);
   }
 }
 function traceRight(i, j, drops, type, prevI, prevJ) {
-  console.log("Right"+"["+i+","+j+"]");
   if (j + 1 < drops[0].length && drops[i][j + 1].combo === 0) {
-    console.log("OK");
-    drops[i][j].combo = comboTraceTopRightDown(i, j + 1, drops, type, i, j);
+    comboTraceTopRightDown(i, j + 1, drops, type, i, j);
   }
 }
 function traceDown(i, j, drops, type, prevI, prevJ) {
-  console.log("Down"+"["+i+","+j+"]");
   if (i + 1 < drops.length && drops[i + 1][i].combo === 0) {
-    console.log("OK");
-    drops[i][j].combo = comboTraceRightDownLeft(i + 1, j, drops, type, i, j);
+    comboTraceRightDownLeft(i + 1, j, drops, type, i, j);
   }
 }
