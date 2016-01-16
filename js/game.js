@@ -30,56 +30,59 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
   },
   isOperable; // ドロップを操作可能かどうか
 
+// 画像ファイルのマニフェストを取得
+function getImageManifest(basePath, folderName) {
+  return [{
+    "id": 0,
+    "src": basePath + folderName + "/fire.png"
+  }, {
+    "id": 1,
+    "src": basePath + folderName + "/water.png"
+  }, {
+    // どっち使ったらいいのかを決めなきゃね
+    "id": 2,
+    "src": basePath + folderName + "/tree.png"
+  }, {
+    "id": 3,
+    "src": basePath + folderName + "/light.png"
+  }, {
+    "id": 4,
+    "src": basePath + folderName + "/dark.png"
+  }, {
+    "id": 5,
+    "src": basePath + folderName + "/cure.png"
+  }, {
+    "id": "bg-image",
+    "src": basePath + "bg.png"
+  }];
+}
+function getDropImages(obj) {
+  var array = [];
+  for (var key in obj) {
+    if(isFinite(key)) {
+      array.push(obj[key]);
+    }
+  }
+  return array;
+}
 // プログラム内で読み込む画像データなどをここで手元に置いておくことにします。「あらかじめ」やることをまとめるよ命令です
 function preload(folderName) {
   var queue = new createjs.LoadQueue(false);
   queue.setMaxConnections(2);
 
   var basePath = "./assets/drop_image/";
-  // どの画像をどんな名前で管理するかを決定するよ。「id」は「識別子」，誰ともかぶることのない，独自の番号（名前）。「src」は「source（源）」の略
-  var manifest = [{
-    "id": "fire",
-    "src": basePath + folderName + "/fire.png"
-  }, {
-    "id": "water",
-    "src": basePath + folderName + "/water.png"
-  }, {
-    // どっち使ったらいいのかを決めなきゃね
-    "id": "tree",
-    "src": basePath + folderName + "/tree.png"
-  }, {
-    "id": "light",
-    "src": basePath + folderName + "/light.png"
-  }, {
-    "id": "dark",
-    "src": basePath + folderName + "/dark.png"
-  }, {
-    "id": "cure",
-    "src": basePath + folderName + "/cure.png"
-  }, {
-    "id": "bg-image",
-    "src": basePath + "bg.png"
-  }];
-  // 指定したリスト（マニフェスト）に従って画像を読み込むよー
+  var manifest = getImageManifest(basePath, folderName);
+  // 取得したマニフェストをもとにファイルの読み込み
   queue.loadManifest(manifest, false);
   queue.load();
   // 読み込みが完了したら「handleComplete」って命令を起動するよ
   queue.addEventListener("complete", handleComplete);
-
 }
-
 // 読み込みが完了したよ，万歳。取得した情報は「event」という名前で取得することにします
 function handleComplete(event) {
   // 読み込み完了に伴い，その結果を保存します
   var result = event.target._loadedResults;
-  // 決めてあった箱に画像データを入れていくよ。
-  // プログラムで「=」は，左辺のものに右辺のものを入れます意味です。イコールじゃないから要注意
-  dropImages[0] = result["fire"];
-  dropImages[1] = result["water"];
-  dropImages[2] = result["tree"];
-  dropImages[3] = result["light"];
-  dropImages[4] = result["dark"];
-  dropImages[5] = result["cure"];
+  dropImages = getDropImages(result);
   bgImage = result["bg-image"];
 
   // よし，事前情報は集まった。いざ，このプログラムの初期化を初期化するよ
