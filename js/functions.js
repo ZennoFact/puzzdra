@@ -19,9 +19,6 @@ function getImageManifest(basePath, folderName) {
   }, {
     "id": 5,
     "src": basePath + folderName + "/cure.png"
-  }, {
-    "id": "bg-image",
-    "src": basePath + "bg.png"
   }];
 }
 // 取得した画像リストのオブジェクトからドロップの画像のみを配列にして返却

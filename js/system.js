@@ -1,3 +1,7 @@
+// $(document).on('contextmenu', function(e){
+//   return false;
+// });
+
 var sounds = [];
 var queue = new createjs.LoadQueue(true);
 queue.installPlugin(createjs.Sound);
@@ -15,4 +19,35 @@ queue.loadManifest(manifest,true);
 queue.addEventListener('fileload',handleFileLoad);
 function handleFileLoad(event){
     sounds.push(createjs.Sound.createInstance(event.item.id));
+}
+
+var inputs = Array.prototype.slice.call(document.getElementsByClassName('input'));
+inputs.forEach(function(elem) {
+  elem.addEventListener('dblclick', showTextField, false);
+});
+
+function showTextField(e) {
+  var item = e.target;
+  item.classList.add('none');
+  var input =document.createElement('input');
+  input.setAttribute("type", "text");
+  var parent = item.parentNode;
+  input.addEventListener("keydown", function(e){
+    if(e.keyCode === 13 && input.value !== "") {
+      console.log(parent.firstChild);
+      parent.firstChild.innerHTML = input.value;
+      parent.firstChild.classList.remove("none")
+      parent.removeChild(e.target);
+      inputs.forEach(function(elem) {
+        elem.addEventListener('dblclick', showTextField, false);
+      });
+    }
+  });
+  parent.appendChild(input);
+  input.focus();
+  inputs.filter(function(elem) {
+    return elem !== item;
+  }).forEach(function(elem) {
+    elem.removeEventListener('dblclick', showTextField, false);
+  });
 }
