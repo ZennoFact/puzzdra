@@ -1,9 +1,36 @@
-body {}
+html,body {
+  font-family:"ヒラギノ角ゴ Pro W3","メイリオ",sans-serif;
+  color: #27313D;
+}
+.wrapper {
+  width: 100%;
+}
+.container {
+  width: 1280px;
+  margin: 0 auto;
+}
+.box {
+  float: left;
+  margin-right: 20px;
+}
+.score-string {
+  margin-top: 22px;
+  margin-left: 20px;
+  font-size: 30px;
+}
+#score {
+  color: #0E7AC4;
+}
+#combo {
+  color: #DE4830;
+}
 section {
   float: left;
   margin: 5px;
 }
-#editor-area {}
+#editor-area {
+  width: 630px;
+}
 #game-area {
   width: 630px;
 }
@@ -62,7 +89,7 @@ input[type="text"]:focus {
 }
 button {
   padding: 15px 30px;
-  margin: 12px 0;
+  margin: 20px 0;
   font-family: Arial, sans-serif;
   font-size: 1.2em;
   text-transform: uppercase;
@@ -86,3 +113,14 @@ button {
 .comment {
   color: #a9a9a9;
 }
+footer {
+  text-align: center;
+}
+.clearfix {
+
+}
+  .clearfix:after {
+    content: "";
+    clear: both;
+    display: block;
+  }
