@@ -13,9 +13,10 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
   DROP_SIZE = 105,
   WIDTH, // パズル画面の幅
   HEIGHT, // パズル画面の高さ
+  folder,
   dropImages = [],
   bgImage,
-  mouseEventOn = false,
+  drag = false,
   dropIsDelete = false,
   dropIsFallen = false,
   isLoop = false,
@@ -39,6 +40,7 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
 
 // 画像データの取得処理（開始前にデータロードを実行する）
 function preload(folderName) {
+  console.log("Loading Start");
   var queue = new createjs.LoadQueue(false);
   queue.setMaxConnections(2);
   var basePath = "./assets/drop_image/";
@@ -50,7 +52,6 @@ function preload(folderName) {
   queue.addEventListener("complete", function (event) {
     var result = event.target._loadedResults;
     dropImages = getDropImageArray(result);
-    bgImage = result["bg-image"];
     // ゲームの初期化へ
     init();
   });
@@ -81,7 +82,7 @@ function initDrops() {
       var type = testDrops[i][j];
       var drop = new Drop(dropImages[type], i, j, type, DROP_SIZE);
       // ドラッグ可能にするための処理
-      if (mouseEventOn) {
+      if (drag) {
         setDragEventForDrop(drop);
       }
       drops[i][j] = drop;
@@ -106,7 +107,7 @@ function render() {
 function startDrag(event) {
   var instance = event.target;
   instance.alpha = 0.5;
-  instance.addEventListener("pressmove", drag);
+  instance.addEventListener("pressmove", dragging);
   instance.addEventListener("pressup", stopDrag);
 
   cueDrop = new Drop(instance.image, instance.row, instance.col, instance.type, DROP_SIZE)
@@ -134,7 +135,7 @@ function startDrag(event) {
   stage.addChild(limmitBar);
 }
 
-function drag(event) {
+function dragging(event) {
   var instance = event.target;
   var x = event.stageX;
   var y = event.stageY;
@@ -205,7 +206,7 @@ function endDrag(drop) {
   timerStart = false;
   comboCount = 0;
 
-  drop.removeEventListener("pressmove", drag);
+  drop.removeEventListener("pressmove", dragging);
   drop.removeEventListener("pressup", stopDrag);
   // ドラッグを解除すると，ドロップが既定の位置に並ぶように
   var col = drop.col;
@@ -250,15 +251,11 @@ function deleteAndFallenDrops() {
     [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}]
   ];
   comboData = comboCheck(comboDrops, drops);
-  console.log(comboData);
   if (!comboData) {
-    console.log("?");
     // ドラッグイベントの復活
     drops.forEach(function(array, i) {
       array.forEach(function(drop, j) {
         setDragEventForDrop(drop);
-        // console.log("OK");
-        // drops[i][j].addEventListener("mousedown", startDrag);
       });
     });
     return;
@@ -274,6 +271,7 @@ function deleteAndFallenDrops() {
 }
 
 function comboAction(phaseCombo) {
+  console.log("Start ComboAction");
   comboData.forEach(function(array) {
     array.forEach(function(data) {
       if (data.type !== 9) {
@@ -283,10 +281,9 @@ function comboAction(phaseCombo) {
   });
   // ドロップ削除のアニメーション
   var timeline = new createjs.Timeline();
-  // TODO: assEventlistenerで追加できるイベントは？
+  // TODO: assEventlistenerで追加できるイベントは？ここ，タイムライン全体の完了を取得したい
   // timeline.addEventListener('complete', deleteDrop)
   var index = 1;
-console.log(comboData);
   while (index <= comboCount) {
     comboData.forEach(function(array, i){
       array.forEach(function(data, j) {
@@ -295,11 +292,10 @@ console.log(comboData);
           timeline.addTween(createjs.Tween.get(drops[i][j], {
             loop: false
           })
-          .wait(250 * index) // TODO: ここの処理が不適切。コンボを追うごとに落ちコンボでも待ち時間が延長される
+          .wait(250 * index)
           .to({
             alpha: 0.0
           }, deleteTime)
-          // TODO: ここ，タイムライン全体の完了を取得したい
           .call(deleteDrop));
         }
       });
@@ -314,6 +310,7 @@ console.log(comboData);
 }
 
 function deleteDrop() {
+  console.log("DeleteAnime");
   // TODO: IEだと，音声の読み込みが間に合わず，エラーになる可能性あり
   ddSound.stop();
   ddSound.play();
@@ -416,4 +413,10 @@ function stageClear() {
 function setDragEventForDrop(drop) {
   // ドラッグ可能にするための処理
   drop.addEventListener("mousedown", startDrag);
+}
+function canDelete() {
+  dropIsDelete = true;
+}
+function gravity() {
+  dropIsFallen = true;
 }

@@ -8,7 +8,6 @@ function comboCheck(comboDrops, drops) {
     }
   }
   // 縦方向へのドロップのつながりを確認。下4行のみを判定
-
   for (var i = comboDrops.length - 1; 1 < i; i--) {
     for (var j = 0; j < comboDrops[0].length; j++) {
       comboDrops = checkDropTypeVertical(i, j, comboDrops, drops);
@@ -77,14 +76,11 @@ function checkComboCount(comboDrops) {
         // TODO: 判定
         comboCounter++;
         phaseCombo++;
-        console.log("[" + i + "," + j + "]判定スタート:combo" + comboCounter);
         if (j === 0) {
           comboTraceTopRightDown(i, j, comboDrops, comboDrops[i][j].type, i, j);
         } else {
           comboTraceLeftTopRight(i, j, comboDrops, comboDrops[i][j].type, i, j);
         }
-        console.log("判定終了");
-        console.log(comboDrops);
       }
     }
   }
