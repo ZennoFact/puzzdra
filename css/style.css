@@ -46,7 +46,7 @@ input[type="text"] {
   color: #646464;
   border: solid 1px #ccc;
   margin: 0 0 20px;
-  width: 80px;
+  width: 160px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
@@ -80,3 +80,9 @@ button {
  button:hover {
    background-color: #81d2c3;
  }
+ .ok {
+   background-color: #58BE89;
+ }
+.comment {
+  color: #a9a9a9;
+}

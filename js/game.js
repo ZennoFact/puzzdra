@@ -13,6 +13,7 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
   DROP_SIZE = 105,
   WIDTH, // パズル画面の幅
   HEIGHT, // パズル画面の高さ
+  folder,
   dropImages = [],
   bgImage,
   drag = false,
@@ -39,6 +40,7 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
 
 // 画像データの取得処理（開始前にデータロードを実行する）
 function preload(folderName) {
+  console.log("Loading Start");
   var queue = new createjs.LoadQueue(false);
   queue.setMaxConnections(2);
   var basePath = "./assets/drop_image/";
