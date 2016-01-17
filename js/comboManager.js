@@ -134,13 +134,14 @@ function traceLeft(i, j, drops, type, prevI, prevJ) {
   }
 }
 function traceTop(i, j, drops, type, prevI, prevJ) {
-  if (0 <= i - 1 && drops[i - 1][i].combo === 0) {
+  if (0 <= i - 1 && drops[i - 1][j].combo === 0) {
     comboTraceLeftTopRight(i - 1, j, drops, type, i, j);
   }
 }
 function traceRight(i, j, drops, type, prevI, prevJ) {
   if (j + 1 < drops[0].length && drops[i][j + 1].combo === 0) {
     comboTraceTopRightDown(i, j + 1, drops, type, i, j);
+
   }
 }
 function traceDown(i, j, drops, type, prevI, prevJ) {
