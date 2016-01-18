@@ -65,10 +65,17 @@ function checkDropTypeVertical(i, j, comboDrops, drops) {
   }
 }
 
-var comboCounter;
+
 // どこのドロップがどのコンボなのかを対応させる。
-function checkComboCount(comboDrops) {
-  comboCounter = 0;
+var comboCounter;
+function checkComboCount(comboDrop, combo) {
+  console.log(combo);
+  comboCounter = combo;
+  // drops.forEach(function(array, i) {
+  //   array.forEach(function(drop, j) {
+  //     if(comboCounter < drop.combo) comboCounter = drop.combo;
+  //   });
+  // });
   var phaseCombo = 0;
   for (var i = comboDrops.length - 1; 0 <= i; i--) {
     for (var j = 0; j < comboDrops[0].length; j++) {

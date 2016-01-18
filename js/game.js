@@ -94,7 +94,6 @@ function initDrops() {
 // 描画
 function render() {
   if (timerStart) {
-    console.log(timeLimmit);
     timeLimmit--;
     var x = cueData.x;
     var y = cueData.y;
@@ -258,6 +257,7 @@ function deleteAndFallenDrops() {
     [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}]
   ];
   comboData = comboCheck(comboDrops, drops);
+  console.log(comboData);
   if (!comboData) {
     // ドラッグイベントの復活
     drops.forEach(function(array, i) {
@@ -267,12 +267,12 @@ function deleteAndFallenDrops() {
     });
     return;
   }
-  // コンボ情報をもとにドロップを消去
+  // コンボ情報をもとにドロップを消去する処理へ
   if (dropIsDelete) {
     var data = checkComboCount(comboData, comboCount);
     comboData = data.drops;
     comboCount = data.count;
-    var phaseCombo = data.phaseCombo
+    var phaseCombo = data.phaseCombo;
     comboAction(phaseCombo);
   }
 }
@@ -292,29 +292,27 @@ function comboAction(phaseCombo) {
   var index = 1;
   var combodrop = 0;
   while (index <= comboCount) {
+    recode.combo++;
     comboData.forEach(function(array, i){
       array.forEach(function(data, j) {
         if (data.combo === index ) {
-          recode.combo++;
+          recode.score += recode.combo * parseInt((1 + index / 10));
+          document.getElementById("score").innerHTML = recode.score;
           combodrop++;
           timeline.addTween(createjs.Tween.get(drops[i][j], {
             loop: false
           })
           .wait(250 * index)
           .to({
-            alpha: 0.0
+            alpha: 0.2
           }, deleteTime)
           .call(deleteDrop));
         }
       });
     });
-    // TODO: コンボシステムここから
-    // if (data.combo === index ) {
-      // recode.score += recode.combo * (1 + index / 10) * combodrop;
-      // document.getElementById("score").innerHTML = recode.score;
-      // document.getElementById("combo").innerHTML = recode.combo;
-    // }
+
     dropCount = combodrop;
+    document.getElementById("combo").innerHTML = recode.combo;
     index++;
   }
   recode.combo = comboCount;
@@ -329,7 +327,8 @@ function deleteDrop() {
 
   // タイムライン完了時のみ削除作業を開始
   deleteDropCount--;
-  if (deleteDropCount === 0) {
+  if (deleteDropCount <= 0) {
+    console.log(comboData);
     comboData.forEach(function(array, i){
       array.forEach(function(data, j) {
         if (data.type !== 9) {
@@ -411,6 +410,8 @@ function dropDeleteCompleted() {
   // TODO: ここ，なぜか０と一致しない
   if (fallenDropCount <= 0) {
     if(isLoop) {
+      deleteDropCount = 0,
+      fallenDropCount = 0;
       deleteAndFallenDrops();
     }
   }
