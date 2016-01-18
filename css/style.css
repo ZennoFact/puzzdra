@@ -94,7 +94,6 @@ button {
   font-size: 1.2em;
   text-transform: uppercase;
   font-weight: bold;
-  background-color: #58BE89;
   color: #ffffff;
   cursor: pointer;
   -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0px 1px 2px rgba(0, 0, 0, 0.2);
@@ -104,12 +103,21 @@ button {
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
- button:hover {
-   background-color: #81d2c3;
- }
- .ok {
-   background-color: #58BE89;
- }
+.btn-run {
+  background-color: #58BE89;
+}
+  .btn-run:hover {
+    background-color: #81d2c3;
+  }
+.btn-code {
+  background-color: #EB2142;
+}
+  .btn-code:hover {
+    background-color: #F27398;
+  }
+.ok {
+ background-color: #58BE89;
+}
 .comment {
   color: #a9a9a9;
 }

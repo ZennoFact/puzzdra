@@ -72,8 +72,6 @@ Drop.prototype.exchenge = function(drop, row, col) {
   return drop;
 };
 Drop.prototype.move = function (x, y) {
-  // this.row = parseInt(y / this.size);
-  // this.col = parseInt(x / this.size);
   this.x = x - this.size / 2;
   this.y = y - this.size / 2;
 };
