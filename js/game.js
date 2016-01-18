@@ -35,12 +35,12 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
   isOperable; // ドロップを操作可能かどうか
   // ドロップ移動時に関係する変数群
   var cueDrop,
+  cueData = {},
   timeBar,
   limmitBar;
 
 // 画像データの取得処理（開始前にデータロードを実行する）
 function preload(folderName) {
-  console.log("Loading Start");
   var queue = new createjs.LoadQueue(false);
   queue.setMaxConnections(2);
   var basePath = "./assets/drop_image/";
@@ -94,7 +94,33 @@ function initDrops() {
 // 描画
 function render() {
   if (timerStart) {
+    console.log(timeLimmit);
     timeLimmit--;
+    var x = cueData.x;
+    var y = cueData.y;
+    timeBar.set({
+      x: x,
+      y: y - 30
+    });
+    // 操作時間の経過に合わせて幅だけ倍率を変更していく
+    limmitBar.setTransform(0, 0, timeLimmit / operateTime, 1);
+    // 設定しておいたフィルターをもとに，バーの色を変更する
+    if (operateTime < 0.3) {
+      limmitBar.filters = [
+        // TODO: タイマーの色を設定できるようにしてあげよう
+        new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0, 0)
+      ];
+      limmitBar.updateCache();
+    }
+    limmitBar.set({
+      x: x + 2,
+      y: y - 28
+    });
+    drops[cueData.drop.row][cueData.drop.col] = cueData.drop;
+    if (timerStart && timeLimmit <= 0) {
+      endDrag(cueData.drop);
+      sounds[4].play();
+    }
   }
   // CreateJSの更新
   stage.update();
@@ -160,29 +186,13 @@ function dragging(event) {
 
   cueDrop.move(x, y);
   // timeBarの位置をマウスに追従させる
-  timeBar.set({
-    x: x,
-    y: y - 30
-  });
-  // 操作時間の経過に合わせて幅だけ倍率を変更していく
-  limmitBar.setTransform(0, 0, timeLimmit / operateTime, 1);
-  // 設定しておいたフィルターをもとに，バーの色を変更する
-  if (timerStart && timeLimmit / operateTime < 0.3) {
-    limmitBar.filters = [
-      // TODO: タイマーの色を設定できるようにしてあげよう
-      new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0, 0)
-    ];
-    limmitBar.updateCache();
-  }
-  limmitBar.set({
-    x: x + 2,
-    y: y - 28
-  });
-  drops[instance.row][instance.col] = instance;
-  if (timerStart && timeLimmit < 0) {
-    endDrag(instance);
-    sounds[4].play();
-  }
+  // timeBar.set({
+  //   x: x,
+  //   y: y - 30
+  // });
+  cueData.drop = instance;
+  cueData.x = x;
+  cueData.y = y;
   // ステージ外のマウスポインタの座標の取得は，rawXとrawYで取得します
   if (event.rawX < 0 || canvas.width < event.rawX || event.rawY < 0 || canvas.height < event.rawY) {
     endDrag(instance);
@@ -228,11 +238,8 @@ function endDrag(drop) {
 
   console.log("end of 1 step");
 }
-// 落ち込んが途切れるまで呼び出され続ける関数
+// 落ちコンが途切れるまで呼び出され続ける関数
 function deleteAndFallenDrops() {
-  // TODO: 以下の処理をコンボが途切れるまで継続。この間，ドラッグ操作無効化
-  console.log("Start Delete & Fallen");
-
   // ドラッグを不可に設定
   if(drops[0][0].hasEventListener("mousedown")) {
     drops.forEach(function(array) {
@@ -271,7 +278,6 @@ function deleteAndFallenDrops() {
 }
 
 function comboAction(phaseCombo) {
-  console.log("Start ComboAction");
   comboData.forEach(function(array) {
     array.forEach(function(data) {
       if (data.type !== 9) {
@@ -284,11 +290,13 @@ function comboAction(phaseCombo) {
   // TODO: assEventlistenerで追加できるイベントは？ここ，タイムライン全体の完了を取得したい
   // timeline.addEventListener('complete', deleteDrop)
   var index = 1;
+  var combodrop = 0;
   while (index <= comboCount) {
     comboData.forEach(function(array, i){
       array.forEach(function(data, j) {
         if (data.combo === index ) {
           recode.combo++;
+          combodrop++;
           timeline.addTween(createjs.Tween.get(drops[i][j], {
             loop: false
           })
@@ -300,17 +308,21 @@ function comboAction(phaseCombo) {
         }
       });
     });
-    recode.score += recode.combo * (1 + index / 10);
+    // TODO: コンボシステムここから
+    // if (data.combo === index ) {
+      // recode.score += recode.combo * (1 + index / 10) * combodrop;
+      // document.getElementById("score").innerHTML = recode.score;
+      // document.getElementById("combo").innerHTML = recode.combo;
+    // }
+    dropCount = combodrop;
     index++;
   }
   recode.combo = comboCount;
-  console.log(recode);
   timeline.addLabel("start", 0);
   timeline.gotoAndPlay("start");
 }
 
 function deleteDrop() {
-  console.log("DeleteAnime");
   // TODO: IEだと，音声の読み込みが間に合わず，エラーになる可能性あり
   ddSound.stop();
   ddSound.play();
@@ -396,7 +408,6 @@ function existUpperDrop(drops, i, j) {
 }
 
 function dropDeleteCompleted() {
-  console.log(fallenDropCount);
   // TODO: ここ，なぜか０と一致しない
   if (fallenDropCount <= 0) {
     if(isLoop) {
