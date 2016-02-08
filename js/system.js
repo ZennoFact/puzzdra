@@ -31,3 +31,101 @@ queue.addEventListener('fileload', handleFileLoad);
 function handleFileLoad(event) {
   sounds.push(createjs.Sound.createInstance(event.item.id));
 }
+// ドロップの配置を記憶しておく二次元配列5*6　
+var DEFAULT_COMBO_DROPS = [
+  [{
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }],
+  [{
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }],
+  [{
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }],
+  [{
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }],
+  [{
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }, {
+    combo: 0,
+    type: 9
+  }]
+];

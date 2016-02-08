@@ -120,3 +120,34 @@ function isNumber(str) {
   }
   return true;
 }
+function setDragEventAllDrops(drops) {
+  drops.forEach(array => {
+    array.forEach(drop => {
+      setDragEventForDrop(drop);
+    });
+  });
+}
+function removeDragEventAllDrops(drops) {
+  drops.forEach(function(array) {
+    array.forEach(function(drop) {
+      drop.removeEventListener("mousedown", startDrag);
+    });
+  });
+}
+
+// 授業として成立させるための処理たち
+function stageClear() {
+  if (stage) {
+    stage.removeAllChildren();
+  }
+}
+function setDragEventForDrop(drop) {
+  // ドラッグ可能にするための処理
+  drop.addEventListener("mousedown", startDrag);
+}
+function canDelete() {
+  dropDeletable = true;
+}
+function gravity() {
+  hasGravity = true;
+}

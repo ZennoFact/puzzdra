@@ -1,5 +1,6 @@
 var canvas, // 画面にものを表示する部分。絵を描くときにキャンバスを使用するでしょ？そのキャンバス
   stage, // CreateJS独自のもの。ものを設置するのは舞台。だから舞台上に部品を置いておきます
+
   dropImageFolderName, // ドロップの画像が入っているフォルダの名前を指定します
   drops = [ // ドロップの配置を記憶しておく二次元配列5*6
     [],
@@ -8,6 +9,7 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
     [],
     [],
   ],
+  scoreData = [],
   ROW = 5,
   COL = 6,
   DROP_SIZE = 105,
@@ -17,27 +19,21 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
   dropImages = [],
   bgImage,
   drag = false,
-  dropIsDelete = false,
-  dropIsFallen = false,
+  dropDeletable = false,
+  hasGravity = false,
   isLoop = false,
   timerStart = false,
   timeLimmit = -1,
   operateTime,
   deleteTime,
   fallTime,
-  recode = {
-    score: 0,
-    combo: 0
-  },
   operatingEndMusicIndex = 4,
   mmSound,
   ddSound,
   isOperable; // ドロップを操作可能かどうか
-  // ドロップ移動時に関係する変数群
-  var cueDrop,
-  cueData = {},
-  timeBar,
-  limmitBar;
+// ドロップ移動時に関係する変数群
+var cueDrop, cueData = {},
+  　timeBar, 　limmitBar;
 
 // 画像データの取得処理（開始前にデータロードを実行する）
 function preload(folderName) {
@@ -49,12 +45,17 @@ function preload(folderName) {
   queue.loadManifest(manifest, false);
   queue.load();
   // 全ファイルの読み込みが完了した際の処理を登録
-  queue.addEventListener("complete", function (event) {
+  queue.addEventListener("complete", function(event) {
     var result = event.target._loadedResults;
     dropImages = getDropImageArray(result);
     // ゲームの初期化へ
     init();
   });
+}
+// ドロップの生成を呼び出す
+function createDrop(i, j) {
+  var type = Math.floor(Math.random() * 6);
+  return new Drop(dropImages[type], i, j, type, DROP_SIZE);
 }
 
 // 初期化（initialize）処理
@@ -62,33 +63,23 @@ function init() {
   canvas = $("#canvas")[0];
   WIDTH = canvas.width = COL * DROP_SIZE;
   HEIGHT = canvas.height = ROW * DROP_SIZE;
-
   stage = new createjs.Stage(canvas);
   stage.addChild(new createjs.Bitmap(bgImage));
 
-  // stage.enableDOMEvents(true);
   createjs.Touch.enable(stage);
   stage.mouseMoveOutside = true;
 
-  initDrops();
-  // 初期化完了，描画(ゲーム)の開始
-  render();
-}
-// ドロップ情報の初期化とstageへの追加
-function initDrops() {
   for (var i = 0; i < ROW; i++) {
     for (var j = 0; j < COL; j++) {
-      // var type = Math.floor(Math.random() * 6);
-      var type = testDrops[i][j];
-      var drop = new Drop(dropImages[type], i, j, type, DROP_SIZE);
-      // ドラッグ可能にするための処理
-      if (drag) {
-        setDragEventForDrop(drop);
-      }
-      drops[i][j] = drop;
+      drops[i][j] = createDrop(i, j);
       stage.addChild(drops[i][j]);
+      if (drag) {
+        setDragEventForDrop(drops[i][j]);
+      }
     }
   }
+  // 初期化完了，描画(ゲーム)の開始
+  render();
 }
 
 // 描画
@@ -135,13 +126,10 @@ function startDrag(event) {
   instance.addEventListener("pressmove", dragging);
   instance.addEventListener("pressup", stopDrag);
 
-  cueDrop = new Drop(instance.image, instance.row, instance.col, instance.type, DROP_SIZE)
-  cueDrop.scaleX = cueDrop.scaleY = 1.1;
-  cueDrop.x = event.stageX - cueDrop.size / 2;
-  cueDrop.y = event.stageY - cueDrop.size / 2;
-  cueDrop.alpha = 0.7;
+  cueDrop = new CueDrop(instance.image, instance.row, instance.col, instance.type, DROP_SIZE, event.stageX, event.stageY);
   stage.addChild(cueDrop);
 
+  // TODO: ここの処理，まとめられるはず
   // 時間関係の処理
   timeBar = new createjs.Shape();
   timeBar.graphics.beginFill("#ffffff").drawRect(0, 0, 100, 30);
@@ -169,14 +157,14 @@ function dragging(event) {
     var newCol = instance.getExchengeCol(x);
     // ドロップの入れ替え作業
     mmSound.stop();
-    if(!timerStart) {
+    if (!timerStart) {
       timeLimmit = operateTime;
       timerStart = true;
     }
     mmSound.play();
     // TODO: 描画を先頭にもってくる方法はこれしかないのか？
-    stage.addChildAt(drops[instance.row][instance.col], 30);
-    stage.addChildAt(drops[newRow][newCol], 30);
+    // stage.addChildAt(drops[instance.row][instance.col], 30);
+    // stage.addChildAt(drops[newRow][newCol], 30);
     drops[instance.row][instance.col] = instance.exchenge(drops[newRow][newCol], instance.row, instance.col);
 
     instance.row = newRow;
@@ -184,11 +172,6 @@ function dragging(event) {
   }
 
   cueDrop.move(x, y);
-  // timeBarの位置をマウスに追従させる
-  // timeBar.set({
-  //   x: x,
-  //   y: y - 30
-  // });
   cueData.drop = instance;
   cueData.x = x;
   cueData.y = y;
@@ -204,8 +187,7 @@ function stopDrag(event) {
   endDrag(instance);
 }
 
-// TODO: 操作時間の設定
-// TODO: 高速に動かしすぎると，画面買いに出たときにアニメーションがついていかない。
+// TODO: 高速に動かしすぎると，画面外に出たときにアニメーションがついていかない。
 var comboDrops,
   comboCount,
   deleteDropCount = 0,
@@ -214,6 +196,7 @@ var comboDrops,
 function endDrag(drop) {
   timerStart = false;
   comboCount = 0;
+
 
   drop.removeEventListener("pressmove", dragging);
   drop.removeEventListener("pressup", stopDrag);
@@ -228,56 +211,54 @@ function endDrag(drop) {
   stage.removeChild(cueDrop);
   stage.removeChild(timeBar);
   stage.removeChild(limmitBar);
-  recode = {
-    score: 0,
-    combo: 0
-  };
+  scoreData = [];
 
   deleteAndFallenDrops();
 
   console.log("end of 1 step");
 }
+
 // 落ちコンが途切れるまで呼び出され続ける関数
 function deleteAndFallenDrops() {
+  console.log("Start: deleteAndFallenDrops");
   // ドラッグを不可に設定
-  if(drops[0][0].hasEventListener("mousedown")) {
-    drops.forEach(function(array) {
-      array.forEach(function(drop) {
-        drop.removeEventListener("mousedown", startDrag);
-      });
-    });
+  if (drops[0][0].hasEventListener("mousedown")) {
+    removeDragEventAllDrops(drops);
   }
 
-  // コンボ情報を返す処理
-  comboDrops = [ // ドロップの配置を記憶しておく二次元配列5*6　
-    [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}],
-    [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}],
-    [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}],
-    [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}],
-    [{combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}, {combo: 0, type: 9}]
-  ];
-  comboData = comboCheck(comboDrops, drops);
-  console.log(comboData);
-  if (!comboData) {
-    // ドラッグイベントの復活
-    drops.forEach(function(array, i) {
-      array.forEach(function(drop, j) {
-        setDragEventForDrop(drop);
-      });
-    });
+  // 各フェーズごとのデータのマッピング用配列をディープコピー
+  comboDrops = $.extend(true, [], DEFAULT_COMBO_DROPS);
+  comboDrops = comboCheck(comboDrops, drops);
+
+  // コンボが成立していなければ，ドラッグ処理を追加してコンボ用のループを終了
+  if (!comboDrops) {
+    setDragEventAllDrops(drops);
+    console.log("End of 1 play.");
     return;
   }
+  var phaseCombo;
   // コンボ情報をもとにドロップを消去する処理へ
-  if (dropIsDelete) {
-    var data = checkComboCount(comboData, comboCount);
+  if (dropDeletable) {
+    var data = checkComboCount(comboDrops, scoreData, comboCount);
     comboData = data.drops;
     comboCount = data.count;
-    var phaseCombo = data.phaseCombo;
-    comboAction(phaseCombo);
+    scoreData = data.scoreData;
+    comboAction(data.phaseCombo);
+
+    // 本来続けていきたい処理
+    // deleteDrop();
+    // dropDeleteCompleted()；
   }
+
+
+
+  console.log("End: deleteAndFallenDrops");
 }
 
 function comboAction(phaseCombo) {
+  console.log("Start: comboAction");
+
+  deleteDropCount = 0;
   comboData.forEach(function(array) {
     array.forEach(function(data) {
       if (data.type !== 9) {
@@ -289,35 +270,50 @@ function comboAction(phaseCombo) {
   var timeline = new createjs.Timeline();
   // TODO: assEventlistenerで追加できるイベントは？ここ，タイムライン全体の完了を取得したい
   // timeline.addEventListener('complete', deleteDrop)
-  var index = 1;
-  var combodrop = 0;
-  while (index <= comboCount) {
-    recode.combo++;
-    comboData.forEach(function(array, i){
+  var index = comboCount - phaseCombo;
+  console.log(index + "=>" + comboCount);
+  while (index < comboCount) {
+    comboData.forEach(function(array, i) {
       array.forEach(function(data, j) {
-        if (data.combo === index ) {
-          recode.score += recode.combo * parseInt((1 + index / 10));
-          document.getElementById("score").innerHTML = recode.score;
-          combodrop++;
+        // console.log("[" + data.combo + ":" + (index + 1) + "]");
+        if (data.combo === index + 1) {
+          // console.log("[" + i + "," + j + "]");
+          document.getElementById("score").innerHTML = scoreData[index].score;
+          document.getElementById("combo").innerHTML = scoreData[index].combo;
+          // var tween = createjs.Tween.get(drops[i][j], {
+          //     loop: false
+          //   })
+          //   .wait(250 * index)
+          //   .to({
+          //     alpha: 0.0
+          //   }, deleteTime);
+          // tween.call(function () {
+          //   timeline.removeTween(tween);
+          //    console.log(timeline._tweens.length);
+          //    if (timeline._tweens.length === 0) {
+          //      deleteDrop();
+          //    }
+          // });
+          // timeline.addTween(tween);
           timeline.addTween(createjs.Tween.get(drops[i][j], {
-            loop: false
-          })
-          .wait(250 * index)
-          .to({
-            alpha: 0.2
-          }, deleteTime)
-          .call(deleteDrop));
+              loop: false
+            })
+            .wait(250 * index)
+            .to({
+              alpha: 0.0
+            }, deleteTime)
+            .call(function() {
+              deleteDrop();
+            }));
         }
       });
     });
-
-    dropCount = combodrop;
-    document.getElementById("combo").innerHTML = recode.combo;
     index++;
   }
-  recode.combo = comboCount;
   timeline.addLabel("start", 0);
   timeline.gotoAndPlay("start");
+  console.log("End: comboAction");
+
 }
 
 function deleteDrop() {
@@ -327,9 +323,10 @@ function deleteDrop() {
 
   // タイムライン完了時のみ削除作業を開始
   deleteDropCount--;
-  if (deleteDropCount <= 0) {
-    console.log(comboData);
-    comboData.forEach(function(array, i){
+  if (deleteDropCount === 0) {
+    console.log("Start: deleteDrop");
+
+    comboData.forEach(function(array, i) {
       array.forEach(function(data, j) {
         if (data.type !== 9) {
           stage.removeChild(drops[i][j]);
@@ -337,19 +334,23 @@ function deleteDrop() {
         }
       });
     });
-    if (dropIsFallen) {
+    if (hasGravity) {
       fallDrops();
     }
+    console.log("End: deleteDrop");
   }
 }
 
 function fallDrops() {
+  console.log("Start: fallDrops");
   // 配列のディープコピーを作成
   var tempData = $.extend(true, [], drops);
-  tempData.forEach(function(array, i){
+  tempData.forEach(function(array, i) {
     array.forEach(function(data, j) {
       if (data === null) {
-        fallenDropCount++;
+        // fallenDropCount++;
+        // console.log("FallenDropCount" + fallenDropCount);
+
         var existFallDrop = existUpperDrop(tempData, i - 1, j);
         if (existFallDrop) {
           tempData[i][j] = tempData[existFallDrop.i][j];
@@ -359,26 +360,23 @@ function fallDrops() {
       }
     });
   });
-
   // TODO: コンボ後のドロップ落下処理
   var timeline = new createjs.Timeline();
   for (var i = drops.length - 1; 0 <= i; i--) {
     for (var j = 0; j < drops[0].length; j++) {
       if (drops[i][j] === null) {
-        fallenDropCount--;
         var existFallDrop = existUpperDrop(drops, i - 1, j);
         if (existFallDrop) {
           drops[i][j] = drops[existFallDrop.i][j];
           drops[existFallDrop.i][j] = null;
           drops[i][j].row = i;
         } else {
-          var type = Math.floor(Math.random() * 6);
-          var drop = new Drop(dropImages[type], i, j, type, DROP_SIZE);
-          drop.y -= HEIGHT;
-
-          drops[i][j] = drop;
+          drops[i][j] = createDrop(i, j);
           stage.addChild(drops[i][j]);
         }
+
+        fallenDropCount++;
+        console.log("FallenDropCount" + fallenDropCount);
 
         timeline.addTween(createjs.Tween.get(drops[i][j], {
             loop: false
@@ -392,6 +390,8 @@ function fallDrops() {
   }
   timeline.addLabel("start", 0);
   timeline.gotoAndPlay("start");
+
+  console.log("End: fallDrops");
 }
 
 function existUpperDrop(drops, i, j) {
@@ -407,28 +407,13 @@ function existUpperDrop(drops, i, j) {
 }
 
 function dropDeleteCompleted() {
-  // TODO: ここ，なぜか０と一致しない
-  if (fallenDropCount <= 0) {
-    if(isLoop) {
-      deleteDropCount = 0,
+  fallenDropCount--;
+  if (fallenDropCount === 0) {
+    if (isLoop) {
+      console.log("!dropDeleteCompleted!");
+      deleteDropCount = 0;
       fallenDropCount = 0;
       deleteAndFallenDrops();
     }
   }
-}
-
-function stageClear() {
-  if (stage) {
-      stage.removeAllChildren();
-  }
-}
-function setDragEventForDrop(drop) {
-  // ドラッグ可能にするための処理
-  drop.addEventListener("mousedown", startDrag);
-}
-function canDelete() {
-  dropIsDelete = true;
-}
-function gravity() {
-  dropIsFallen = true;
 }
