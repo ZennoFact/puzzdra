@@ -7,7 +7,9 @@
 </head>
 <body>
   <header>
-    <h1>京都コンピュータ学院体験授業 <small>vol.1 パズルゲーム編</small></h1>
+    <div class="header-box">
+      <h2>京都コンピュータ学院体験授業 <small>vol.1 パズルゲーム編</small></h2>
+    </div>
   </header>
   <div class="wrapper">
     <div class="container">
@@ -27,30 +29,30 @@
               fallTime = <span><span class="input setting">250</span></span>; <span class="comment">// 落下時間（ミリ秒）</span><br>
               <span class="comment">// システム設定ここまで</span>
               <hr>
-              <span class="comment">/* Step.1 ドロップを読み込みます。</span><br>
-                 <span class="comment">「preload(folder);」と入力してください。 */</span><br>
+              <span class="comment">// Step.1 ドロップを読み込みます。</span><br>
+              <span class="comment">//「preload(folder);」と入力してください。</span><br>
               <!-- <span><span id="step1" class="input">Step.1</span></span><br> -->
               <span><span id="step1" class="input">preload(folder);</span></span><br>
               <br>
-              <span class="comment">/* Step.2 ドロップをドラッグできるようにします。</span><br>
-              <span class="comment">「drag = true;」と入力してください。 */</span><br>
+              <span class="comment">// Step.2 ドロップをドラッグできるようにします。</span><br>
+              <span class="comment">// 「drag = true;」と入力してください。</span><br>
               <!-- <span><span id="step2" class="input">Step.2</span></span><br> -->
               <span><span id="step2" class="input">drag = true;</span></span><br>
               <br>
-              <span class="comment">/* Step.3 ドロップが消えるようにします</span><br>
-              <span class="comment">「canDelete();」と入力してください。 */</span><br>
-              <span><span id="step3" class="input">canDelete();</span></span><br>
+              <span class="comment">// Step.3 ドロップが消えるようにします</span><br>
+              <span class="comment">// 「canDelete();」と入力してください。</span><br>
               <!-- <span><span id="step3" class="input">Step.3</span></span><br> -->
+              <span><span id="step3" class="input">canDelete();</span></span><br>
               <br>
-              <span class="comment">/* Step.4 ドロップが落ちるようにします。</span><br>
-                <span class="comment">「gravity();」と入力してください。 */</span><br>
-              <span><span id="step4" class="input">gravity();</span></span><br>
+              <span class="comment">// Step.4 ドロップが落ちるようにします。</span><br>
+              <span class="comment">// 「gravity();」と入力してください。</span><br>
               <!-- <span><span id="step4" class="input">Step.4</span></span><br> -->
+              <span><span id="step4" class="input">gravity();</span></span><br>
               <br>
-              <span class="comment">/* Step.5 ドロップが落ちた後，つながっていたら消えるようにします。</span><br>
-                <span class="comment">「isLoop = true;」と入力してください。 */</span><br>
-              <span><span id="step5" class="input">isLoop = true;</span></span><br>
+              <span class="comment">// Step.5 ドロップが落ちた後，つながっていたら消えるようにします。</span><br>
+              <span class="comment">// 「isLoop = true;」と入力してください。</span><br>
               <!-- <span><span id="step5" class="input">Step.5</span></span><br> -->
+              <span><span id="step5" class="input">isLoop = true;</span></span><br>
             </p>
           </div>
         </section>
@@ -118,6 +120,11 @@
         </script>
       </div>
       <div id="code"></div>
+      <!-- contenteditable=true の確認。下のエディタでは使用してみる。うまくいけば上も改修 -->
+      <div id="editor">
+        <span class="comment">// ここはコメント</span><br>
+        <span contenteditable=true>testtesttes</span>
+      </div>
       <footer><div><button class="btn-code">⚠ code ⚠</button></div><div><p>&copy 2016 ZennoFact.</p></div></footer>
     </div>
   </div>

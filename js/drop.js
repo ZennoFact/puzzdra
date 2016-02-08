@@ -75,3 +75,18 @@ Drop.prototype.move = function (x, y) {
   this.x = x - this.size / 2;
   this.y = y - this.size / 2;
 };
+
+function CueDrop(image, row, col, type, size, stageX, stageY) {
+  this.image = image;
+  this.row = row;
+  this.col = col;
+  this.type = type;
+  this.size = size;
+
+  this.scaleX = this.scaleY = 1.1;
+  this.x = stageX - this.size / 2;
+  this.y = stageY - this.size / 2;
+  this.alpha = 0.7;
+}
+CueDrop.prototype = new Drop();
+CueDrop.prototype.constructor = Drop;
