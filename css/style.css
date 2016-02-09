@@ -117,10 +117,16 @@ button {
   }
 .btn-code {
   background-color: #EB2142;
+  width: 100px;
+  margin: 45px auto;
+  padding: 15px 30px;
+  font-family: Arial, sans-serif;
+  font-size: 1.2em;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+  color: #ffffff;
 }
-  .btn-code:hover {
-    background-color: #F27398;
-  }
 .ok {
  background-color: #58BE89;
 }
@@ -138,3 +144,28 @@ footer {
     clear: both;
     display: block;
   }
+/* エディタ関連のスタイル */
+div.tabbox { margin: 0px; padding: 0px; width: 100%; }
+
+/* ▼(B)タブ部分 */
+p.tabs { margin: 0px; padding: 0px;}
+p.tabs a {
+   font-size: 1.4em;
+   display: block; width: 250px; float: left;
+   margin: 0px 2px 0px 0px; padding: 5px;
+   background-color: #646464;  color: #eeeeee;
+   text-decoration: none;
+}
+
+div.tab {
+  font-size: 1.6em;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  padding: 5px;
+  height: 600px; overflow: auto; clear: left;
+}
+div.tab {
+  background-color: #464646;  color: #eeeeee;
+  display: none;
+}
