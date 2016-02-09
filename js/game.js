@@ -190,12 +190,14 @@ function stopDrag(event) {
 // TODO: 高速に動かしすぎると，画面外に出たときにアニメーションがついていかない。
 var comboDrops,
   comboCount,
+  totalCombo,
   deleteDropCount = 0,
   fallenDropCount = 0;
 
 function endDrag(drop) {
   timerStart = false;
   comboCount = 0;
+  totalCombo = 0;
 
 
   drop.removeEventListener("pressmove", dragging);
@@ -239,15 +241,12 @@ function deleteAndFallenDrops() {
   var phaseCombo;
   // コンボ情報をもとにドロップを消去する処理へ
   if (dropDeletable) {
-    var data = checkComboCount(comboDrops, scoreData, comboCount);
+    var data = checkComboCount(comboDrops, scoreData, comboCount, totalCombo);
+    totalCombo += comboCount;
     comboData = data.drops;
     comboCount = data.count;
     scoreData = data.scoreData;
     comboAction(data.phaseCombo);
-
-    // 本来続けていきたい処理
-    // deleteDrop();
-    // dropDeleteCompleted()；
   }
 
 
@@ -278,23 +277,6 @@ function comboAction(phaseCombo) {
         // console.log("[" + data.combo + ":" + (index + 1) + "]");
         if (data.combo === index + 1) {
           // console.log("[" + i + "," + j + "]");
-          document.getElementById("score").innerHTML = scoreData[index].score;
-          document.getElementById("combo").innerHTML = scoreData[index].combo;
-          // var tween = createjs.Tween.get(drops[i][j], {
-          //     loop: false
-          //   })
-          //   .wait(250 * index)
-          //   .to({
-          //     alpha: 0.0
-          //   }, deleteTime);
-          // tween.call(function () {
-          //   timeline.removeTween(tween);
-          //    console.log(timeline._tweens.length);
-          //    if (timeline._tweens.length === 0) {
-          //      deleteDrop();
-          //    }
-          // });
-          // timeline.addTween(tween);
           timeline.addTween(createjs.Tween.get(drops[i][j], {
               loop: false
             })
@@ -310,6 +292,14 @@ function comboAction(phaseCombo) {
     });
     index++;
   }
+  var score = 0;
+  var combo = 0;
+  scoreData.forEach(function(elem) {
+    score += elem.score;
+    combo = elem.combo;
+  });
+  document.getElementById("score").innerHTML = score;
+  document.getElementById("combo").innerHTML = combo;
   timeline.addLabel("start", 0);
   timeline.gotoAndPlay("start");
   console.log("End: comboAction");

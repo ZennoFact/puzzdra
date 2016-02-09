@@ -68,7 +68,7 @@ function checkDropTypeVertical(i, j, comboDrops, drops) {
 
 // どこのドロップがどのコンボなのかを対応させる。
 var comboCounter;
-function checkComboCount(comboDrop, score, comboCount) {
+function checkComboCount(comboDrop, score, comboCount, totalCombo) {
   comboCounter = comboCount;
   var phaseCombo = 0;
   var dropCount = 0;
@@ -84,15 +84,13 @@ function checkComboCount(comboDrop, score, comboCount) {
           dropCount = comboTraceLeftTopRight(i, j, comboDrops, comboDrops[i][j].type, i, j);
         }
         score.push({
-          score: parseInt(dropCount * 100 * (1 + comboCounter / 10 )),
+          score: parseInt(dropCount * 100 * (1 + (comboCounter + totalCombo) / 10 )),
           combo: comboCounter
         });
         dropCount = 0;
       }
     }
   }
-  console.log("PhaseCombo: " + phaseCombo);
-  console.log("ComboCounter: " + comboCounter);
   // TODO: ドロップの削除をスムーズにするためにはphasecomboが必要なはず。まだ使ってないけど
   return {
     drops: comboDrops,
