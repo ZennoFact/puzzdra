@@ -1,4 +1,4 @@
-var canvas, // 画面にものを表示する部分。絵を描くときにキャンバスを使用するでしょ？そのキャンバス
+var canvas, // 画面にものを表示する部分。絵を描くときにキャンバス
   stage, // CreateJS独自のもの。ものを設置するのは舞台。だから舞台上に部品を置いておきます
 
   dropImageFolderName, // ドロップの画像が入っているフォルダの名前を指定します
@@ -15,6 +15,7 @@ var canvas, // 画面にものを表示する部分。絵を描くときにキ�
   DROP_SIZE = 105,
   WIDTH, // パズル画面の幅
   HEIGHT, // パズル画面の高さ
+  userName,
   folder,
   dropImages = [],
   bgImage,
@@ -300,6 +301,10 @@ function comboAction(phaseCombo) {
   });
   document.getElementById("score").innerHTML = score;
   document.getElementById("combo").innerHTML = combo;
+
+  // TODO: 得点の送信
+  postScore(userName, score, combo);
+
   timeline.addLabel("start", 0);
   timeline.gotoAndPlay("start");
   console.log("End: comboAction");

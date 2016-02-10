@@ -24,6 +24,7 @@
               <span class="comment">// Step.Extra システム設定</span></span>
               <br>
               <span class="comment">// 終了後，自由に変更を加えてください</span></span>
+              <br> userName = "<span><span class="input setting">YourName</span></span>"; <span class="comment">// 名前を入れてね</span>
               <br> folder = "sample<span><span class="input setting">1</span></span>"; <span class="comment">// 1 or 2</span>
               <br> mmSound = sounds[<span><span class="input setting">0</span></span>]; <span class="comment">// 0 or 1</span>
               <br> ddSound = sounds[<span><span class="input setting">2</span></span>]; <span class="comment">// 2 or 3</span>
@@ -37,40 +38,40 @@
               <br>
               <span class="comment">//「preload(folder);」と入力してください。</span>
               <br>
+              <span><span id="step1" class="input">preload(folder);</span></span><br>
               <!-- <span><span id="step1" class="input">Step.1</span></span><br> -->
-              <span><span id="step1" class="input">preload(folder);</span></span>
               <br>
               <br>
               <span class="comment">// Step.2 ドロップをドラッグできるようにします。</span>
               <br>
               <span class="comment">// 「drag = true;」と入力してください。</span>
               <br>
+              <span><span id="step2" class="input">drag=true;</span></span><br>
               <!-- <span><span id="step2" class="input">Step.2</span></span><br> -->
-              <span><span id="step2" class="input">drag = true;</span></span>
               <br>
               <br>
               <span class="comment">// Step.3 ドロップが消えるようにします</span>
               <br>
               <span class="comment">// 「canDelete();」と入力してください。</span>
               <br>
+              <span><span id="step3" class="input">canDelete();</span></span><br>
               <!-- <span><span id="step3" class="input">Step.3</span></span><br> -->
-              <span><span id="step3" class="input">canDelete();</span></span>
               <br>
               <br>
               <span class="comment">// Step.4 ドロップが落ちるようにします。</span>
               <br>
               <span class="comment">// 「gravity();」と入力してください。</span>
               <br>
+              <span><span id="step4" class="input">gravity();</span></span><br>
               <!-- <span><span id="step4" class="input">Step.4</span></span><br> -->
-              <span><span id="step4" class="input">gravity();</span></span>
               <br>
               <br>
               <span class="comment">// Step.5 ドロップが落ちた後，つながっていたら消えるようにします。</span>
               <br>
               <span class="comment">// 「isLoop = true;」と入力してください。</span>
               <br>
+              <span><span id="step5" class="input">isLoop=true;</span></span><br>
               <!-- <span><span id="step5" class="input">Step.5</span></span><br> -->
-              <span><span id="step5" class="input">isLoop = true;</span></span>
               <br>
             </p>
           </div>
@@ -175,41 +176,41 @@
             inputs.push(elem.innerHTML);
           });
 
-          if (inputs[6].replace(/\s+/g, "") !== 'preload(folder);') {
-            inputs[6] = "";
+          if (inputs[7].replace(/\s+/g, "") !== 'preload(folder);') {
+            inputs[7] = "";
           }
-          if (inputs[7].replace(/\s+/g, "") !== 'drag=true;') {
-            inputs[7] = "drag = false;";
+          if (inputs[8].replace(/\s+/g, "") !== 'drag=true;') {
+            inputs[8] = "drag = false;";
           }
-          if (inputs[8].replace(/\s+/g, "") !== 'canDelete();') {
-            inputs[8] = "";
-          }
-          if (inputs[9].replace(/\s+/g, "") !== 'gravity();') {
+          if (inputs[9].replace(/\s+/g, "") !== 'canDelete();') {
             inputs[9] = "";
           }
-          if (inputs[10].replace(/\s+/g, "") !== 'isLoop=true;') {
-            inputs[10] = "isLoop = false;";
+          if (inputs[10].replace(/\s+/g, "") !== 'gravity();') {
+            inputs[10] = "";
+          }
+          if (inputs[11].replace(/\s+/g, "") !== 'isLoop=true;') {
+            inputs[11] = "isLoop = false;";
           }
 
-          folder = 'sample' + inputs[0];
-          mmSound = sounds[parseInt(inputs[1])];
-          ddSound = sounds[parseInt(inputs[2])];
-          operateTime = parseInt(inputs[3]);
-          deleteTime = parseInt(inputs[4]);
-          fallTime = parseInt(inputs[5]);
+          userName = inputs[0];
+          folder = 'sample' + inputs[1];
+          mmSound = sounds[parseInt(inputs[2])];
+          ddSound = sounds[parseInt(inputs[3])];
+          operateTime = parseInt(inputs[4]);
+          deleteTime = parseInt(inputs[5]);
+          fallTime = parseInt(inputs[6]);
 
           var tabs = $(".tab");
-          console.log(tabs);
 
           $('#code').html('<script>stageClear();' +
             tabs[1].innerText +
             tabs[2].innerText +
             tabs[0].innerText +
-            inputs[6].replace(/\s+/g, "") +
             inputs[7].replace(/\s+/g, "") +
             inputs[8].replace(/\s+/g, "") +
             inputs[9].replace(/\s+/g, "") +
-            inputs[10].replace(/\s+/g, "") + '<\/script>');
+            inputs[10].replace(/\s+/g, "") +
+            inputs[11].replace(/\s+/g, "") + '<\/script>');
         });
       </script>
 </body>

@@ -297,3 +297,22 @@ function changeTab(tabName, btnName) {
    document.getElementById(tabName).style.display = 'block';
    document.getElementById(btnName).style.backgroundColor = '#464646';
 }
+
+function postScore(userName, score, combo) {
+  $.ajax({
+    type: 'POST',
+    url: "./update.php",
+    data: {
+      name: userName,
+      score: score,
+      combo: combo
+    },
+    success: function () {
+        console.log("post success");
+    },
+    error: function (data) {
+        console.log("error");
+        console.log(data);
+    }
+  });
+}
