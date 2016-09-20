@@ -4,6 +4,9 @@ html,body {
   font-family:"ヒラギノ角ゴ Pro W3","メイリオ",sans-serif;
   color: #27313D;
 }
+body {
+  font-size: 1.2em;
+}
 h2 {
   margin: 0;
   padding-bottom: 10px;
@@ -57,12 +60,12 @@ section {
 }
 div.editorbox {
   width: 630px;
-  height: 525px;
+  height: 520px;
   overflow-y: scroll;
   overflow-x: hidden;
   background-color: #464646;
   color: #ffffff;
-  font-size: 1.6em;
+  /*font-size: 1.6em;*/
   -moz-user-select: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -71,28 +74,7 @@ div.editorbox {
 .none {
   display: none;
 }
-.input {
-  background-color: #EE6557;
-  padding: 0px 5px;
-}
-.input.setting {
-  background-color: #40AAEF;
-}
-input[type="text"] {
-  background-color: #464646;
-  border: 0;
-  padding: 10px;
-  font-size: 1.1em;
-  font-family: "Consolas", Arial, sans-serif;
-  color: #ffffff;
-  margin: 0 0 20px;
-  width: 160px;
-}
-input[type="text"]:focus {
-  /*border-width: 0px;
-  border-style: None;
-  outline: 0;*/
-}
+
 button {
   padding: 15px 30px;
   margin: 20px 0;
@@ -117,21 +99,14 @@ button {
   }
 .btn-code {
   background-color: #EB2142;
-  width: 100px;
+  width: 120px;
   margin: 45px auto;
   padding: 15px 30px;
   font-family: Arial, sans-serif;
-  font-size: 1.2em;
   text-transform: uppercase;
   font-weight: bold;
   text-align: center;
   color: #ffffff;
-}
-.ok {
- background-color: #58BE89;
-}
-.comment {
-  color: #a9a9a9;
 }
 footer {
   text-align: center;
@@ -147,10 +122,11 @@ footer {
 /* エディタ関連のスタイル */
 div.tabbox { margin: 0px; padding: 0px; width: 100%; }
 
-/* ▼(B)タブ部分 */
+/* ▼タブ部分 */
 p.tabs { margin: 0px; padding: 0px;}
+
 p.tabs a {
-   font-size: 1.4em;
+   font-size: 1.2em;
    display: block; width: 250px; float: left;
    margin: 0px 2px 0px 0px; padding: 5px;
    background-color: #646464;  color: #eeeeee;
@@ -158,7 +134,7 @@ p.tabs a {
 }
 
 div.tab {
-  font-size: 1.6em;
+  /*font-size: 1.6em;*/
   -moz-user-select: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -168,4 +144,59 @@ div.tab {
 div.tab {
   background-color: #464646;  color: #eeeeee;
   display: none;
+}
+input[type=text] {
+  color: #ffffff;
+  margin: 5px 2px;
+  font-size: 1.1em;
+}
+textarea {
+  resize: none;
+  /*line-height: 0.6em;*/
+  /*min-width: 80px;*/
+  /*max-width: 400px;*/
+  margin: 5px;
+  padding: 5px;
+  vertical-align: bottom;
+  overflow-y: hidden;
+  color: #ffffff;
+  /*font-size: 1.1em;*/
+}
+/* エディタの文字色 */
+.class {
+  color: orange;
+}
+.method {
+  color: cornflowerblue;
+}
+.string {
+  color: #67b168;
+}
+.reserved {
+  color: violet;
+}
+.comment {
+  color: #a9a9a9;
+}
+.blank {
+  width: 4em;
+}
+
+.input {
+  background-color: #EE6557;
+  padding: 5px;
+  border: none;
+}
+.input.setting {
+  background-color: #40AAEF;
+  width: 100px;
+}
+.input.warning {
+  background-color: orange;
+}
+.input.ok {
+  background-color: #58BE89;
+}
+.comment {
+  color: #a9a9a9;
 }

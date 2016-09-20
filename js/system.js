@@ -164,86 +164,23 @@ function getDropImageArray(obj) {
   return array;
 }
 
-var inputs = Array.prototype.slice.call(document.getElementsByClassName('input'));
-inputs.forEach(function(elem) {
-  elem.addEventListener('dblclick', showTextField, false);
-});
+// 正解一覧
+var answers = [
+    'preload(folder);',
+    'drag=true;',
+    'canDelete();',
+    'gravity();',
+    'isLoop=true;',
+    'saveData();',
+    'loadData();',
+    'update.php'
+];
 
-function showTextField(e) {
-  var item = e.target;
-  item.classList.add('none');
-  var input = document.createElement('input');
-  input.setAttribute("type", "text");
-  var regex = /Step\.\d/;
-  if (regex.test(item.innerHTML)) {　　
-    input.value = "";
-  } else {　　
-    input.value = item.innerHTML;
+function inputCheck(i, text) {
+  if (6 < i && answers[i - 7] === text.replace(/\s+/g, "")) {
+    return true;
   }
-  var parent = item.parentNode;
-  input.addEventListener("keydown", function(e) {
-    if (e.keyCode === 13 && input.value !== "") {
-      // TODO: バリデーションチェックする
-      // var classes = item.getAttribute("class").split();
-      // console.log(classes);
-      // if (classes[0] === "setting" && !isNumber(input.value)) {
-      //   return;
-      // }
-      parent.firstChild.innerHTML = input.value;
-      parent.firstChild.classList.remove("none")
-      parent.removeChild(e.target);
-      inputs.forEach(function(elem) {
-        // elem.addEventListener('mouseover', showTextField, false);
-        elem.addEventListener('dblclick', showTextField, false);
-      });
-      inputStringCheck();
-    }
-  });
-  parent.appendChild(input);
-  input.focus();
-  inputs.filter(function(elem) {
-    return elem !== item;
-  }).forEach(function(elem) {
-    elem.removeEventListener('dblclick', showTextField, false);
-  });
-}
-
-function inputStringCheck() {
-  document.getElementById('step1').classList.remove('ok');
-  document.getElementById('step2').classList.remove('ok');
-  document.getElementById('step3').classList.remove('ok');
-  document.getElementById('step4').classList.remove('ok');
-  document.getElementById('step5').classList.remove('ok');
-  if (document.getElementById('step1').innerHTML.replace(/\s+/g, "") === 'preload(folder);') {
-    document.getElementById('step1').classList.add('ok');
-  } else if (document.getElementById('step1').innerHTML === "Step.1") {
-    document.getElementById('step1').innerHTML = "Step.1";
-    document.getElementById('step1').classList.remove('ok');
-  }
-  if (document.getElementById('step2').innerHTML.replace(/\s+/g, "") === 'drag=true;') {
-    document.getElementById('step2').classList.add('ok');
-  } else if (document.getElementById('step2').innerHTML === "Step.2") {
-    document.getElementById('step2').innerHTML = "Step.2";
-    document.getElementById('step2').classList.remove('ok');
-  }
-  if (document.getElementById('step3').innerHTML.replace(/\s+/g, "") === 'canDelete();') {
-    document.getElementById('step3').classList.add('ok');
-  } else if (document.getElementById('step3').innerHTML === "Step.3") {
-    document.getElementById('step3').innerHTML = "Step.3";
-    document.getElementById('step3').classList.remove('ok');
-  }
-  if (document.getElementById('step4').innerHTML.replace(/\s+/g, "") === 'gravity();') {
-    document.getElementById('step4').classList.add('ok');
-  } else if (document.getElementById('step4').innerHTML === "Step.4") {
-    document.getElementById('step4').innerHTML = "Step.4";
-    document.getElementById('step4').classList.remove('ok');
-  }
-  if (document.getElementById('step5').innerHTML.replace(/\s+/g, "") === 'isLoop=true;') {
-    document.getElementById('step5').classList.add('ok');
-  } else if (document.getElementById('step5').innerHTML === "Step.5") {
-    document.getElementById('step5').innerHTML = "Step.5";
-    document.getElementById('step5').classList.remove('ok');
-  }
+  return false;
 }
 
 function isNumber(str) {
@@ -296,4 +233,40 @@ function changeTab(tabName, btnName) {
    // 指定箇所のみ表示
    document.getElementById(tabName).style.display = 'block';
    document.getElementById(btnName).style.backgroundColor = '#464646';
+}
+
+function saveData() {
+  var gameData = Array.prototype.slice.call(document.getElementsByClassName('input'));
+  gameData.forEach(function(elem, i) {
+    localStorage.setItem(i.toString(), elem.value);
+  });
+}
+
+function loadData() {
+  var gameData = Array.prototype.slice.call(document.getElementsByClassName('input'));
+  gameData.forEach(function(elem, i) {
+    elem.value = localStorage.getItem(i.toString());
+  });
+}
+
+function postScore(userName, score, combo) {
+  if ( document.getElementsByTagName('input')[14].value !== 'update.php') return false;
+  $.ajax({
+    type: 'POST',
+    url: 'http://www.kcg.ac.jp/mogi/pd/update.php',
+    //url: './update.php',
+    data: {
+      name: userName,
+      score: score,
+      combo: combo
+    }
+  }).then(
+      function(data) {
+        console.log("post success");
+      },
+      function(data) {
+        console.log("error");
+        console.log(data);
+      }
+  );
 }
