@@ -217,13 +217,10 @@ function endDrag(drop) {
   scoreData = [];
 
   deleteAndFallenDrops();
-
-  console.log("end of 1 step");
 }
 
 // 落ちコンが途切れるまで呼び出され続ける関数
 function deleteAndFallenDrops() {
-  console.log("Start: deleteAndFallenDrops");
   // ドラッグを不可に設定
   if (drops[0][0].hasEventListener("mousedown")) {
     removeDragEventAllDrops(drops);
@@ -236,7 +233,6 @@ function deleteAndFallenDrops() {
   // コンボが成立していなければ，ドラッグ処理を追加してコンボ用のループを終了
   if (!comboDrops) {
     setDragEventAllDrops(drops);
-    console.log("End of 1 play.");
     return;
   }
   var phaseCombo;
@@ -249,14 +245,9 @@ function deleteAndFallenDrops() {
     scoreData = data.scoreData;
     comboAction(data.phaseCombo);
   }
-
-
-
-  console.log("End: deleteAndFallenDrops");
 }
 
 function comboAction(phaseCombo) {
-  console.log("Start: comboAction");
 
   deleteDropCount = 0;
   comboData.forEach(function(array) {
@@ -271,13 +262,10 @@ function comboAction(phaseCombo) {
   // TODO: assEventlistenerで追加できるイベントは？ここ，タイムライン全体の完了を取得したい
   // timeline.addEventListener('complete', deleteDrop)
   var index = comboCount - phaseCombo;
-  console.log(index + "=>" + comboCount);
   while (index < comboCount) {
     comboData.forEach(function(array, i) {
       array.forEach(function(data, j) {
-        // console.log("[" + data.combo + ":" + (index + 1) + "]");
         if (data.combo === index + 1) {
-          // console.log("[" + i + "," + j + "]");
           timeline.addTween(createjs.Tween.get(drops[i][j], {
               loop: false
             })
@@ -307,7 +295,6 @@ function comboAction(phaseCombo) {
 
   timeline.addLabel("start", 0);
   timeline.gotoAndPlay("start");
-  console.log("End: comboAction");
 
 }
 
@@ -319,7 +306,6 @@ function deleteDrop() {
   // タイムライン完了時のみ削除作業を開始
   deleteDropCount--;
   if (deleteDropCount === 0) {
-    console.log("Start: deleteDrop");
 
     comboData.forEach(function(array, i) {
       array.forEach(function(data, j) {
@@ -332,19 +318,16 @@ function deleteDrop() {
     if (hasGravity) {
       fallDrops();
     }
-    console.log("End: deleteDrop");
   }
 }
 
 function fallDrops() {
-  console.log("Start: fallDrops");
   // 配列のディープコピーを作成
   var tempData = $.extend(true, [], drops);
   tempData.forEach(function(array, i) {
     array.forEach(function(data, j) {
       if (data === null) {
         // fallenDropCount++;
-        // console.log("FallenDropCount" + fallenDropCount);
 
         var existFallDrop = existUpperDrop(tempData, i - 1, j);
         if (existFallDrop) {
@@ -371,7 +354,6 @@ function fallDrops() {
         }
 
         fallenDropCount++;
-        console.log("FallenDropCount" + fallenDropCount);
 
         timeline.addTween(createjs.Tween.get(drops[i][j], {
             loop: false
@@ -385,8 +367,6 @@ function fallDrops() {
   }
   timeline.addLabel("start", 0);
   timeline.gotoAndPlay("start");
-
-  console.log("End: fallDrops");
 }
 
 function existUpperDrop(drops, i, j) {
@@ -405,7 +385,6 @@ function dropDeleteCompleted() {
   fallenDropCount--;
   if (fallenDropCount === 0) {
     if (isLoop) {
-      console.log("!dropDeleteCompleted!");
       deleteDropCount = 0;
       fallenDropCount = 0;
       deleteAndFallenDrops();

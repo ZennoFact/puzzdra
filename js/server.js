@@ -53,10 +53,15 @@ $(function () {
                       '</div>');
     var rnd = Math.floor(Math.random() * 6);
     $jqObj.css("background", colors[rnd]);
-    $(".main").append($jqObj);
+      $(".main").append($jqObj);
+      $jqObj.animate({
+      height: "200px",
+    }, 500 );
   }
   function updateRecode(index) {
     console.log($('.score'));
+    // TODO: divへのアニメーションの追加
+  
     $('.score')[index].innerHTML = scoreData[index].score;
     $('.combo')[index].innerHTML = scoreData[index].combo + " combo!";
   }

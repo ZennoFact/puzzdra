@@ -17,66 +17,62 @@
     <div class="container">
       <div class="main clearfix">
         <section id="editor-area">
-          <p>プログラムの変更箇所は，ダブルクリックで編集可能になります。</p>
-          <p>変更完了後は，RUNボタンを押してプログラムを起動してください。</p>
+          <p>プログラムの変更箇所は，ダブルクリックで編集可能になります。<br>
+          変更完了後は，RUNボタンを押してプログラムを起動してください。</p>
           <div class="editorbox" unselectable="on">
             <p>
               <span class="comment">// Step.Extra システム設定</span></span>
               <br>
               <span class="comment">// 終了後，自由に変更を加えてください</span></span>
-              <br> userName = "<span><span class="input setting">YourName</span></span>"; <span class="comment">// 名前を入れてね</span>
-              <br> folder = "sample<span><span class="input setting">1</span></span>"; <span class="comment">// 1 or 2</span>
-              <br> mmSound = sounds[<span><span class="input setting">0</span></span>]; <span class="comment">// 0 or 1</span>
-              <br> ddSound = sounds[<span><span class="input setting">2</span></span>]; <span class="comment">// 2 or 3</span>
-              <br> operateTime = <span><span class="input setting">400</span></span>; <span class="comment">// 操作時間（フレーム）</span>
-              <br> deleteTime = <span><span class="input setting">300</span></span>; <span class="comment">// 消滅時間（ミリ秒）</span>
-              <br> fallTime = <span><span class="input setting">250</span></span>; <span class="comment">// 落下時間（ミリ秒）</span>
+              <br> userName <span class="reserved">=</span> <span class="string">"</span><input type="text" class="input setting" value="YourName"/><span class="string">"</span><span class="reserved">;</span> <span class="comment">// 名前を入れてね</span>
+              <br> folder <span class="reserved">=</span> <span class="string">"</span>sample<input type="text" class="input setting" value="1"><span class="string">"</span><span class="reserved">;</span> <span class="comment">// 1 - 5</span>
+              <br> mmSound <span class="reserved">=</span> sounds[<input type="text" class="input setting" value="0">]<span class="reserved">;</span> <span class="comment">// 0 or 1</span>
+              <br> ddSound <span class="reserved">=</span> sounds[<input type="text" class="input setting" value="2">]<span class="reserved">;</span> <span class="comment">// 2 or 3</span>
+              <br> operateTime <span class="reserved">=</span> <input type="text" class="input setting" value="400"><span class="reserved">;</span> <span class="comment">// 操作時間（フレーム）</span>
+              <br> deleteTime <span class="reserved">=</span> <input type="text" class="input setting" value="300"><span class="reserved">;</span> <span class="comment">// 消滅時間（ミリ秒）</span>
+              <br> fallTime <span class="reserved">=</span> <input type="text" class="input setting" value="250"><span class="reserved">;</span> <span class="comment">// 落下時間（ミリ秒）</span>
               <br>
               <span class="comment">// システム設定ここまで</span>
               <hr>
-              <span class="comment">// Step.1 ドロップを読み込みます。</span>
+              <span class="comment">// Step.1 ドロップを読み込みます。</span><br>
+              <!-- <span class="comment">//「preload(folder);」と入力してください。</span><br> -->
+              <input type="text" id="step1" class="input" value="Step.1"><br>
               <br>
-              <span class="comment">//「preload(folder);」と入力してください。</span>
+              <span class="comment">// Step.2 ドロップをドラッグできるようにします。</span><br>
+              <!-- <span class="comment">// 「drag = true;」と入力してください。</span><br> -->
+              <input type="text" id="step2" class="input" value="Step.2"><br>
               <br>
-              <span><span id="step1" class="input">preload(folder);</span></span><br>
-              <!-- <span><span id="step1" class="input">Step.1</span></span><br> -->
+              <span class="comment">// Step.3 ドロップが消えるようにします</span><br>
+              <!-- <span class="comment">// 「canDelete();」と入力してください。</span><br> -->
+              <input type="text" id="step3" class="input" value="Step.3"><br>
               <br>
+              <span class="comment">// Step.4 ドロップが落ちるようにします。</span><br>
+              <!-- <span class="comment">// 「gravity();」と入力してください。</span><br> -->
+              <input type="text" id="step4" class="input" value="Step.4"><br>
               <br>
-              <span class="comment">// Step.2 ドロップをドラッグできるようにします。</span>
+              <span class="comment">// Step.5 ドロップが落ちた後，つながっていたら消えるようにします。</span><br>
+              <!-- <span class="comment">// 「isLoop = true;」と入力してください。</span><br> -->
+              <input type="text" id="step5" class="input" value="Step.5"><br>
               <br>
-              <span class="comment">// 「drag = true;」と入力してください。</span>
+              <span class="comment">// 内部のゲーム設定ここまで</span>
+              <hr>
+              <span class="comment">// プログラムの保存</span><br>
+              <span class="comment">// Sub.1 データの保存をします。</span><br>
+              <input type="text" id="step6" class="input warning" value="Sub.1"><br>
               <br>
-              <span><span id="step2" class="input">drag=true;</span></span><br>
-              <!-- <span><span id="step2" class="input">Step.2</span></span><br> -->
+              <span class="comment">// Sub.2 データを読み込めるか確認します。</span><br>
+              <input type="text" id="step7" class="input warning" value="Sub.2"><br>
               <br>
-              <br>
-              <span class="comment">// Step.3 ドロップが消えるようにします</span>
-              <br>
-              <span class="comment">// 「canDelete();」と入力してください。</span>
-              <br>
-              <span><span id="step3" class="input">canDelete();</span></span><br>
-              <!-- <span><span id="step3" class="input">Step.3</span></span><br> -->
-              <br>
-              <br>
-              <span class="comment">// Step.4 ドロップが落ちるようにします。</span>
-              <br>
-              <span class="comment">// 「gravity();」と入力してください。</span>
-              <br>
-              <span><span id="step4" class="input">gravity();</span></span><br>
-              <!-- <span><span id="step4" class="input">Step.4</span></span><br> -->
-              <br>
-              <br>
-              <span class="comment">// Step.5 ドロップが落ちた後，つながっていたら消えるようにします。</span>
-              <br>
-              <span class="comment">// 「isLoop = true;」と入力してください。</span>
-              <br>
-              <span><span id="step5" class="input">isLoop=true;</span></span><br>
-              <!-- <span><span id="step5" class="input">Step.5</span></span><br> -->
+              <hr>
+              <span class="comment">// データをサーバに送信する</span><br>
+              <span class="comment">// Sub.3 通信先を設定する</span><br>
+              <input type="text" id="step8" class="input warning" value="Sub.3"><br>
               <br>
             </p>
           </div>
         </section>
         <section id="game-area">
+          <div>
           <div>
             <div id="game-header clearfix">
               <div class="box">
@@ -146,7 +142,7 @@
 
         <div id="code">
         </div>
-        <!-- contenteditable=true の確認。下のエディタでは使用してみる。うまくいけば上も改修 -->
+
         <footer>
           <div>
             <p>&copy 2016 ZennoFact.</p>
@@ -154,43 +150,29 @@
         </footer>
         </div>
       </div>
-      <script src="./js/lib/jquery-2.1.3.min.js"></script>
+      <script src="./js/lib/jquery-1.12.0.min.js"></script>
       <script src="./js/lib/easeljs-0.8.2.min.js"></script>
       <script src="./js/lib/preloadjs-0.6.2.min.js"></script>
       <script src="./js/lib/tweenjs-0.6.2.min.js"></script>
       <script src="./js/lib/soundjs-0.6.2.min.js"></script>
       <script src="./js/cheat.js"></script>
       <script src="./js/system.js"></script>
-      <!-- <script src="./js/drop.js"></script>
+      <script src="./js/drop.js"></script>
       <script src="./js/comboManager.js"></script>
-      <script src="./js/game.js"></script> -->
+      <script src="./js/game.js"></script>
       <script>
-
-
         changeTab('tab1', 'tabBtn1');
-
-        $('button').click(function() {
+        document.getElementsByTagName('button')[0].addEventListener('click', function(){
           var gameData = Array.prototype.slice.call(document.getElementsByClassName('input'));
           var inputs = [];
           gameData.forEach(function(elem) {
-            inputs.push(elem.innerHTML);
+            inputs.push(elem.value);
           });
-
-          if (inputs[7].replace(/\s+/g, "") !== 'preload(folder);') {
-            inputs[7] = "";
-          }
-          if (inputs[8].replace(/\s+/g, "") !== 'drag=true;') {
-            inputs[8] = "drag = false;";
-          }
-          if (inputs[9].replace(/\s+/g, "") !== 'canDelete();') {
-            inputs[9] = "";
-          }
-          if (inputs[10].replace(/\s+/g, "") !== 'gravity();') {
-            inputs[10] = "";
-          }
-          if (inputs[11].replace(/\s+/g, "") !== 'isLoop=true;') {
-            inputs[11] = "isLoop = false;";
-          }
+          answers.forEach(function(elem, i) {
+            if (inputs[i + 7].replace(/\s+/g, "") !== elem) {
+              inputs[i + 7] = "";
+            }
+          });
 
           userName = inputs[0];
           folder = 'sample' + inputs[1];
@@ -201,7 +183,6 @@
           fallTime = parseInt(inputs[6]);
 
           var tabs = $(".tab");
-
           $('#code').html('<script>stageClear();' +
             tabs[1].innerText +
             tabs[2].innerText +
@@ -210,8 +191,30 @@
             inputs[8].replace(/\s+/g, "") +
             inputs[9].replace(/\s+/g, "") +
             inputs[10].replace(/\s+/g, "") +
-            inputs[11].replace(/\s+/g, "") + '<\/script>');
+            inputs[11].replace(/\s+/g, "") +
+            inputs[12].replace(/\s+/g, "") +
+            inputs[13].replace(/\s+/g, "") + '<\/script>');
         });
+
+        var gameData = Array.prototype.slice.call(document.getElementsByClassName('input'));
+        gameData.forEach(function(elem, i) {
+          elem.addEventListener("keyup", function(e) {
+            var isSuccess = inputCheck(i, elem.value);
+            if (isSuccess) elem.classList.add('ok');
+            else elem.classList.remove('ok');
+          });
+        });
+
+        if (localStorage.getItem('13') == 'loadData();') {
+          loadData();
+          var gameData = Array.prototype.slice.call(document.getElementsByClassName('input'));
+          gameData.forEach(function(elem, i) {
+            var isSuccess = inputCheck(i, elem.value);
+            if (isSuccess) elem.classList.add('ok');
+            else elem.classList.remove('ok');
+          });
+        }
+
       </script>
 </body>
 
